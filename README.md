@@ -1,6 +1,6 @@
-# Factory Matrix
+# Corporate Martyrdom
 
-Factory Matrix is a browser-based factory automation simulator built with Phaser and Vite. Build a production line, route materials through conveyors and storage, manage a component-based power grid, and deliver goods to complete milestones.
+Corporate Martyrdom is a browser-based factory automation simulator built with Phaser and Vite. Build a production line, route materials through conveyors and storage, manage a component-based power grid, and deliver goods to complete milestones.
 
 ## Features
 
@@ -63,7 +63,7 @@ This repository intentionally excludes `node_modules/`, `dist/`, local environme
 git add .
 git commit -m "Initial commit"
 git branch -M main
-git remote add origin https://github.com/<your-username>/<your-repository>.git
+git remote add origin https://github.com/evanarganta/corporate-martyrdom.git
 git push -u origin main
 ```
 
