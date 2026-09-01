@@ -784,7 +784,7 @@ export const TECH_MILESTONES = [
       { item: 'iron_ingot', target: 60 },
       { item: 'copper_ingot', target: 40 }
     ],
-    unlockedBuildings: ['electric_drill', 'power_pole', 'wire_tool', 'coal_generator', 'assembler_mk1', 'splitter', 'merger'],
+    unlockedBuildings: ['electric_drill', 'coal_generator', 'assembler_mk1', 'splitter', 'merger'],
     unlockedRecipes: ['craft_iron_plate', 'craft_gear', 'craft_copper_wire'],
     unlockedItems: ['iron_plate', 'gear', 'copper_wire']
   },
