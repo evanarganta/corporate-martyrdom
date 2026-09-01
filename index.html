@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factory Matrix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/index.css">
+</head>
+<body class="theme-dark select-none">
+  <!-- Main Game Canvas Container -->
+  <div id="game-container"></div>
+
+  <!-- UI Overlay System -->
+  <div id="ui-overlay">
+    
+    <!-- Top Bar -->
+    <header class="hud-header glass-panel">
+      <div class="hud-left stats-ticker">
+        <!-- Power Gauge -->
+        <div class="stat-pill" title="Power Grid Supply / Demand">
+          <span class="stat-label">Power</span>
+          <span id="stat-power-val" class="stat-value text-power">0 kW</span>
+          <div class="power-bar-mini">
+            <div id="power-fill-mini" class="power-bar-fill" style="width: 100%"></div>
+          </div>
+        </div>
+
+        <!-- Research Counter -->
+        <div class="stat-pill" title="Research Points">
+          <span class="stat-label">Research</span>
+          <span id="stat-research-val" class="stat-value text-amber">0</span>
+        </div>
+      </div>
+
+      
+
+        <div class="hud-center">
+          <div class="speed-controls">
+            <button id="btn-speed-pause" class="btn-icon" title="Pause (Space)">❚❚</button>
+            <button id="btn-speed-1x" class="btn-icon active" title="1x Speed">1x</button>
+            <button id="btn-speed-2x" class="btn-icon" title="2x Speed">2x</button>
+            <button id="btn-speed-5x" class="btn-icon" title="5x Speed">5x</button>
+        </div>
+        </div>
+
+      <div class="hud-right">
+        <!-- Game Speed Controls -->
+
+        <!-- Menu Action Buttons -->
+        <button id="btn-toggle-milestones" class="btn-action" title="Milestones (T)">Research</button>
+        <button id="btn-toggle-stats" class="btn-action" title="Production Statistics (P)">Analytics</button>
+        <button id="btn-toggle-blueprints" class="btn-action" title="Save & System (B)">Save</button>
+        <button id="btn-toggle-audio" class="btn-icon" title="Sound Toggle (M)">SND</button>
+        <button id="btn-help" class="btn-icon" title="Guide (H)">?</button>
+      </div>
+    </header>
+
+    <!-- Milestone Tracker Widget (Top Right) -->
+    <div id="milestone-tracker-card" class="glass-panel floating-card">
+      <div class="card-header">
+        <span class="badge-tier" id="tracker-tier-badge">PHASE 1</span>
+        <h4 id="tracker-title">Electrification</h4>
+      </div>
+      <div class="card-body">
+        <div id="tracker-deliveries" class="delivery-items-list">
+          <!-- Dynamic delivery goals -->
+        </div>
+        <div class="tracker-progress-bar">
+          <div id="tracker-progress-fill" style="width: 0%"></div>
+        </div>
+        <div class="tracker-footer">
+          <span id="tracker-progress-text">0 / 100</span>
+          <button id="btn-open-launchpad" class="btn-sm btn-accent">Hub</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Placement Banner (Center Bottom above Hotbar) -->
+    <div id="placement-guide-banner" class="placement-banner hidden">
+      <span class="placement-key-hint" id="placement-confirm-hint"><kbd>E</kbd> / <kbd>Click</kbd> Build</span>
+      <span class="placement-key-hint" id="placement-rotate-hint"><kbd>R</kbd> Rotate</span>
+      <span class="placement-action-name" id="placement-active-name">Conveyor</span>
+      <span class="placement-key-hint"><kbd>Q</kbd> Cancel</span>
+    </div>
+
+    <!-- Building Hotbar (Bottom Center) -->
+    <div id="bottom-hud">
+      <!-- Category Tabs (Side-by-side Z, X, C, V, B, and Demolish Q) -->
+      <div class="category-tabs glass-panel">
+        <button class="cat-btn active" data-category="logistics">
+          <span class="cat-label">Logistics</span>
+          <span class="cat-key">Z</span>
+        </button>
+        <button class="cat-btn" data-category="extraction">
+          <span class="cat-label">Extraction</span>
+          <span class="cat-key">X</span>
+        </button>
+        <button class="cat-btn" data-category="processing">
+          <span class="cat-label">Processing</span>
+          <span class="cat-key">C</span>
+        </button>
+        <button class="cat-btn" data-category="power">
+          <span class="cat-label">Power</span>
+          <span class="cat-key">V</span>
+        </button>
+        <button class="cat-btn" data-category="logistics_adv">
+          <span class="cat-label">Storage</span>
+          <span class="cat-key">B</span>
+        </button>
+        <button class="cat-btn btn-demolish-tab" data-tool="demolish">
+          <span class="cat-label">Demolish</span>
+          <span class="cat-key">Q</span>
+        </button>
+      </div>
+
+      <!-- Hotbar Slots -->
+      <div id="hotbar-items-container" class="hotbar-slots glass-panel">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+
+    <!-- Machine Inspector Panel -->
+    <div id="inspector-panel" class="glass-panel modal-panel hidden">
+      <div class="panel-header">
+        <div class="header-left">
+          <h3 id="inspector-title">Smelter</h3>
+          <span id="inspector-status" class="status-badge status-idle">IDLE</span>
+        </div>
+        <button id="btn-close-inspector" class="btn-close" aria-label="Close inspector">&times;</button>
+      </div>
+
+      <div class="panel-content">
+        <!-- Compact power telemetry -->
+        <div class="inspector-power-grid">
+          <div class="inspector-section inspector-stat-card">
+            <div id="inspector-grid-label" class="section-label">GRID SATISFACTION</div>
+            <div class="metric-row"><span id="inspector-grid-metric-label">Grid</span><span id="inspector-efficiency-val" class="text-green">100%</span></div>
+            <div class="progress-bar-wrap"><div id="inspector-efficiency-bar" class="progress-fill fill-green" style="width: 100%"></div></div>
+          </div>
+          <div class="inspector-section inspector-stat-card">
+            <div id="inspector-power-label" class="section-label">POWER DEMAND</div>
+            <div class="metric-row"><span id="inspector-power-metric-label">Draw</span><span id="inspector-power-val">20 kW</span></div>
+          </div>
+        </div>
+
+        <!-- Recipe Selector -->
+        <div id="inspector-recipe-section" class="inspector-section">
+          <div class="section-label">ACTIVE RECIPE</div>
+          <div class="recipe-selector-current" id="recipe-current-display">
+            <span id="recipe-name">Iron Ingot</span>
+            <button id="btn-change-recipe" class="btn-sm">Configure</button>
+          </div>
+          <div id="recipe-select-dropdown" class="recipe-dropdown hidden">
+            <!-- Dynamic recipes -->
+          </div>
+        </div>
+
+        <div class="buffer-cycle-dashboard">
+          <div class="inspector-section inspector-buffer-section">
+            <div id="inspector-input-label" class="section-label">INPUT BUFFER</div>
+            <div id="inspector-inputs" class="inventory-slots"></div>
+          </div>
+          <div class="crafting-gauge-wrap">
+            <div id="inspector-cycle-ring" class="cycle-ring" style="--cycle-progress: 0"><span id="inspector-cycle-time">1.5s</span></div>
+            <div class="gauge-label"><span>Cycle</span></div>
+            <div class="progress-bar-wrap" aria-hidden="true"><div id="inspector-craft-bar" class="progress-fill fill-amber" style="width: 0%"></div></div>
+          </div>
+          <div class="inspector-section inspector-buffer-section">
+            <div id="inspector-output-label" class="section-label">OUTPUT BUFFER</div>
+            <div id="inspector-outputs" class="inventory-slots"></div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="inspector-actions">
+          <button id="btn-inspector-flush" class="btn-secondary btn-sm">Flush Buffers</button>
+          <button id="btn-inspector-demolish-line" class="btn-danger btn-sm hidden">Remove Line</button>
+          <button id="btn-inspector-demolish" class="btn-danger btn-sm">Dismantle</button>
+        </div>
+
+        <div id="inspector-silo-action-row" class="inspector-silo-action-wrap hidden">
+          <button id="btn-inspector-submit" class="btn-accent btn-sm btn-full">Deliver to Hub</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Research Matrix Modal -->
+    <div id="modal-milestones" class="modal-backdrop hidden">
+      <div class="modal-window glass-panel modal-lg">
+        <div class="modal-header">
+          <div class="header-title">
+            <h2>RESEARCH MATRIX</h2>
+            <p>Fulfill delivery quotas to unlock advanced technologies.</p>
+          </div>
+          <button class="btn-close modal-close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body tech-tree-body">
+          <div class="tier-tabs" id="tech-tier-tabs"></div>
+          <div class="tech-nodes-canvas" id="tech-nodes-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Production Statistics Modal -->
+    <div id="modal-stats" class="modal-backdrop hidden">
+      <div class="modal-window glass-panel modal-md">
+        <div class="modal-header">
+          <div class="header-title">
+            <h2>PRODUCTION ANALYTICS</h2>
+          </div>
+          <button class="btn-close modal-close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body stats-body">
+          <div class="analytics-grid">
+            <div class="analytics-card">
+              <h4>POWER NETWORK</h4>
+              <div class="power-large-metric">
+                <span id="analytics-power-pct" class="metric-huge text-power">100%</span>
+                <span id="analytics-power-sub">Supply: 0 kW / Demand: 0 kW</span>
+              </div>
+              <div class="progress-bar-wrap">
+                <div id="analytics-power-bar" class="progress-fill fill-power" style="width: 100%"></div>
+              </div>
+            </div>
+
+            <div class="analytics-card">
+              <h4>MINERAL EXTRACTION</h4>
+              <div class="ore-rates-list" id="analytics-ore-rates"></div>
+            </div>
+
+            <div class="analytics-card span-2">
+              <h4>THROUGHPUT RATES (/min)</h4>
+              <div class="rates-table-wrap">
+                <table class="rates-table">
+                  <thead>
+                    <tr>
+                      <th>Resource</th>
+                      <th>Produced</th>
+                      <th>Consumed</th>
+                      <th>Net Rate</th>
+                      <th>Buffer</th>
+                    </tr>
+                  </thead>
+                  <tbody id="analytics-rates-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save / Blueprints Modal -->
+    <div id="modal-blueprints" class="modal-backdrop hidden">
+      <div class="modal-window glass-panel modal-sm">
+        <div class="modal-header">
+          <div class="header-title">
+            <h2>SECTOR SAVE</h2>
+          </div>
+          <button class="btn-close modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="system-actions">
+            <button id="btn-save-game" class="btn-action btn-full">Save Sector</button>
+            <button id="btn-load-game" class="btn-secondary btn-full">Load Last Save</button>
+            <button id="btn-export-save" class="btn-secondary btn-full">Export Backup (JSON)</button>
+            <button id="btn-import-save" class="btn-secondary btn-full">Import Backup (JSON)</button>
+            <input type="file" id="file-import-save" accept=".json" style="display:none">
+            <button id="btn-reset-world" class="btn-danger btn-full">Reset Sector Map</button>
+          </div>
+          <p id="save-status-msg" class="save-feedback-text"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="modal-help" class="modal-backdrop hidden">
+      <div class="modal-window glass-panel modal-md">
+        <div class="modal-header">
+          <div class="header-title">
+            <h2>COMMAND GUIDE</h2>
+          </div>
+          <button class="btn-close modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body help-body">
+          <div class="help-grid">
+            <div class="help-section">
+              <h4>Controls</h4>
+              <ul>
+                <li><kbd>Left Click Drag</kbd> / <kbd>WASD</kbd>: Pan Viewport</li>
+                <li><kbd>Mouse Scroll</kbd>: Zoom In / Out</li>
+                <li><kbd>1</kbd> - <kbd>9</kbd>: Select Item in Category (Press again to cancel)</li>
+                <li><kbd>Z</kbd> <kbd>X</kbd> <kbd>C</kbd> <kbd>V</kbd> <kbd>B</kbd>: Switch Category</li>
+                <li><kbd>Q</kbd>: Demolish Mode / Cancel Placement</li>
+                <li><kbd>E</kbd>: Confirm Action</li>
+                <li><kbd>R</kbd>: Rotate Placement</li>
+                <li><kbd>T</kbd>: Research Matrix</li>
+                <li><kbd>P</kbd>: Production Analytics</li>
+                <li><kbd>Space</kbd>: Pause / Resume</li>
+                <li><kbd>Esc</kbd>: Close Windows</li>
+              </ul>
+            </div>
+
+            <div class="help-section">
+              <h4>Logistics</h4>
+              <ul>
+                <li>Place drills directly over ore deposits.</li>
+                <li>Drills eject materials from their output face onto conveyors.</li>
+                <li>Smelters process ores into pure metal bars.</li>
+                <li>Fabricators assemble components and circuit boards.</li>
+                <li>Power poles connect machines to generators.</li>
+                <li>Conveyors connect seamlessly into corners.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Universal Confirmation Dialog Modal -->
+    <div id="modal-confirm" class="modal-backdrop hidden">
+      <div class="confirm-box glass-panel modal-sm">
+        <h4 id="confirm-title">Confirm Action</h4>
+        <p id="confirm-msg">Dismantle this structure?</p>
+        <div class="confirm-actions">
+          <button id="btn-confirm-cancel" class="btn-secondary btn-sm">Cancel [Q]</button>
+          <button id="btn-confirm-ok" class="btn-danger btn-sm">Confirm [E]</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
