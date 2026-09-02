@@ -1,4 +1,4 @@
-import { DIR_VECTORS, BUILDINGS, TILE_SIZE } from '../core/Constants.js';
+import { DIR_VECTORS, RECIPES, TILE_SIZE } from '../core/Constants.js';
 
 export class LogisticsEngine {
   constructor(grid) {
@@ -151,11 +151,20 @@ export class LogisticsEngine {
 
     if (['smelter_mk1', 'smelter_mk2', 'assembler_mk1', 'assembler_mk2'].includes(building.type)) {
       if (!building.recipeId) return false;
+      // Keep incompatible cargo out of a machine while still allowing every
+      // ingredient its selected recipe requires.
+      const recipeInputs = this.getRecipeInputs(building.recipeId);
+      if (!recipeInputs.includes(itemType)) return false;
       const currentInput = building.inputs[itemType] || 0;
       return currentInput < 30;
     }
 
     return false;
+  }
+
+  getRecipeInputs(recipeId) {
+    const recipe = RECIPES.find(r => r.id === recipeId);
+    return recipe ? recipe.inputs.map(input => input.item) : [];
   }
 
   insertItemIntoBuilding(building, itemType, fromDir = null) {

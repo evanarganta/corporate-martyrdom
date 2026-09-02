@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const logistics = new LogisticsEngine(grid);
   const milestoneManager = new MilestoneManager();
   const economy = new EconomyManager();
-  const factory = new FactoryEngine(grid, logistics, milestoneManager);
+  const factory = new FactoryEngine(grid, logistics, milestoneManager, economy);
 
   const hasSave = localStorage.getItem(SaveManager.SAVE_KEY);
   if (hasSave) {
@@ -31,6 +31,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (smelter) smelter.recipeId = 'smelt_iron';
 
     const hub = grid.placeBuilding('launchpad', 63, 53, 0);
+    if (hub) hub.isStarterHub = true;
 
     grid.placeBuilding('conveyor_mk1', 60, 55, 0);
     grid.placeBuilding('conveyor_mk1', 60, 54, 0);
@@ -46,16 +47,13 @@ window.addEventListener('DOMContentLoaded', () => {
     const solar3 = grid.placeBuilding('solar_panel', 52, 64, 0);
     const pole1 = grid.placeBuilding('power_pole', 57, 62, 0);
     const pole2 = grid.placeBuilding('power_pole', 57, 56, 0);
-    const pole3 = grid.placeBuilding('power_pole', 62, 57, 0);
 
     if (solar1 && pole1) grid.addWire(solar1, pole1);
     if (solar2 && pole1) grid.addWire(solar2, pole1);
     if (solar3 && pole1) grid.addWire(solar3, pole1);
     if (pole1 && pole2) grid.addWire(pole1, pole2);
-    if (pole2 && pole3) grid.addWire(pole2, pole3);
     if (pole2 && drill) grid.addWire(pole2, drill);
     if (pole2 && smelter) grid.addWire(pole2, smelter);
-    if (pole3 && hub) grid.addWire(pole3, hub);
   }
 
   const sceneInstance = new MainGameScene();

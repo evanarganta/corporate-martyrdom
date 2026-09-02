@@ -48,12 +48,19 @@ export class MilestoneManager {
 
     const req = cur.deliveries.find(d => d.item === itemKey);
     if (req) {
-      prog.delivered[itemKey] = (prog.delivered[itemKey] || 0) + count;
-      this.researchPoints += count * 5;
+      const remaining = Math.max(0, req.target - (prog.delivered[itemKey] || 0));
+      const accepted = Math.min(Math.max(0, Math.floor(count)), remaining);
+      if (accepted <= 0) return 0;
+      prog.delivered[itemKey] = (prog.delivered[itemKey] || 0) + accepted;
+      this.researchPoints += accepted * 5;
       
       this.checkCompletion(cur);
+      window.dispatchEvent(new CustomEvent('milestone-progress'));
+      return accepted;
     } else {
-      this.researchPoints += count * 1;
+      const accepted = Math.max(0, Math.floor(count));
+      this.researchPoints += accepted;
+      return accepted;
     }
   }
 
@@ -69,7 +76,7 @@ export class MilestoneManager {
       }
     }
 
-    if (allMet) {
+    if (allMet && this.researchPoints >= milestone.costRP) {
       this.completeMilestone(milestone);
     }
   }
@@ -77,6 +84,7 @@ export class MilestoneManager {
   completeMilestone(milestone) {
     const prog = this.progress[milestone.id];
     prog.completed = true;
+    this.researchPoints -= milestone.costRP;
 
     milestone.unlockedBuildings.forEach(b => this.unlockedBuildings.add(b));
     milestone.unlockedRecipes.forEach(r => this.unlockedRecipes.add(r));

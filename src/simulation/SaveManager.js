@@ -24,7 +24,10 @@ export class SaveManager {
           inputs: b.inputs,
           outputs: b.outputs,
           conveyorItems: b.conveyorItems || [],
-          craftProgress: b.craftProgress || 0
+          craftProgress: b.craftProgress || 0,
+          burnProgress: b.burnProgress || 0,
+          storedEnergy: b.storedEnergy,
+          isStarterHub: Boolean(b.isStarterHub)
         })),
         wires: (grid.wires || []).map(w => ({
           fromId: w.fromId,
@@ -84,6 +87,9 @@ export class SaveManager {
           inst.outputs = bData.outputs || {};
           inst.conveyorItems = bData.conveyorItems || [];
           inst.craftProgress = bData.craftProgress || 0;
+          inst.burnProgress = bData.burnProgress || 0;
+          if (bData.storedEnergy !== undefined) inst.storedEnergy = bData.storedEnergy;
+          inst.isStarterHub = Boolean(bData.isStarterHub) || (bData.type === 'launchpad' && bData.x === 63 && bData.y === 53);
           if (bData.id) idMap.set(bData.id, inst.id);
         }
       });

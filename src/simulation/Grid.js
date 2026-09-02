@@ -183,6 +183,7 @@ export class Grid {
   canTransmitPower(building) {
     return Boolean(building && (
       building.type === 'power_pole' ||
+      building.type === 'accumulator' ||
       (building.def && (building.def.powerOutput || 0) > 0)
     ));
   }
@@ -190,6 +191,7 @@ export class Grid {
   canConnectToPower(building) {
     return Boolean(building && (
       this.canTransmitPower(building) ||
+      building.type === 'accumulator' ||
       (building.def && (building.def.powerDemand || 0) > 0)
     ));
   }

@@ -196,9 +196,9 @@ export class UIManager {
     document.getElementById('btn-inspector-demolish').addEventListener('click', () => {
       if (this.inspectedBuilding) {
         const b = this.inspectedBuilding;
-        this.showConfirmDialog(
+      this.showConfirmDialog(
           `Dismantle ${b.def.name}`,
-          'Dismantle this facility? All contained materials will be retrieved.',
+          'Dismantle this facility? Contained cargo will be liquidated at its market value.',
           () => {
             this.scene.demolishAt(b.x, b.y);
           }
@@ -293,6 +293,7 @@ export class UIManager {
       this.renderHotbar();
       this.updateMilestoneTracker();
     });
+    window.addEventListener('milestone-progress', () => this.updateMilestoneTracker());
   }
 
   showConfirmDialog(title, message, onConfirm) {
@@ -656,12 +657,12 @@ export class UIManager {
     } else if (powerRole === 'distribution') {
       const reach = b.def.supplyRadius || b.def.maxReach || b.def.wireReach || 0;
       this.inspectorGridLabel.textContent = 'GRID RELAY';
-      this.inspectorGridMetricLabel.textContent = 'Link';
-      this.inspectorEfficiencyVal.textContent = 'READY';
-      this.inspectorEfficiencyBar.style.width = '100%';
-      this.inspectorPowerLabel.textContent = 'NETWORK REACH';
-      this.inspectorPowerMetricLabel.textContent = 'Range';
-      this.inspectorPowerVal.textContent = `${reach} tiles`;
+      this.inspectorGridMetricLabel.textContent = 'Incoming';
+      this.inspectorEfficiencyVal.textContent = `${Math.round(b.powerReceived || 0)} kW`;
+      this.inspectorEfficiencyBar.style.width = `${Math.min(100, Math.round(((b.powerReceived || 0) / Math.max(1, b.powerSupplied || b.powerReceived || 1)) * 100))}%`;
+      this.inspectorPowerLabel.textContent = 'OUTGOING POWER';
+      this.inspectorPowerMetricLabel.textContent = 'Branches';
+      this.inspectorPowerVal.textContent = `${Math.round(b.powerSupplied || 0)} kW · ${reach} tile reach`;
     } else {
       this.inspectorGridLabel.textContent = 'GRID SATISFACTION';
       this.inspectorGridMetricLabel.textContent = 'Grid';

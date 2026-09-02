@@ -407,7 +407,7 @@ export const BUILDINGS = {
 
   burner_drill: {
     id: 'burner_drill',
-    name: 'Mechanical Drill',
+    name: 'Starter Electric Drill',
     category: 'extraction',
     width: 2,
     height: 2,
@@ -725,7 +725,7 @@ export const TECH_MILESTONES = [
     deliveries: [
       { item: 'iron_ingot', target: 20 }
     ],
-    unlockedBuildings: ['conveyor_mk1', 'burner_drill', 'smelter_mk1', 'storage_chest', 'power_pole', 'solar_panel', 'wire_tool'],
+    unlockedBuildings: ['conveyor_mk1', 'burner_drill', 'smelter_mk1', 'storage_chest', 'launchpad', 'power_pole', 'solar_panel', 'wire_tool'],
     unlockedRecipes: ['smelt_iron', 'smelt_copper'],
     unlockedItems: ['iron_ore', 'copper_ore', 'coal', 'iron_ingot', 'copper_ingot']
   },

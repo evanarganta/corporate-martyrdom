@@ -2,10 +2,11 @@ import { RECIPES, BUILDINGS, DIR_VECTORS } from '../core/Constants.js';
 import { audioManager } from '../core/AudioManager.js';
 
 export class FactoryEngine {
-  constructor(grid, logisticsEngine, milestoneManager) {
+  constructor(grid, logisticsEngine, milestoneManager, economy = null) {
     this.grid = grid;
     this.logistics = logisticsEngine;
     this.milestoneManager = milestoneManager;
+    this.economy = economy;
     
     this.rateHistory = {};
     this.rateTimer = 0;
@@ -24,6 +25,9 @@ export class FactoryEngine {
 
     const silos = this.grid.buildings.filter(b => b.type === 'storage_chest');
     silos.forEach(silo => this.processStorageSilo(silo, deltaSec));
+
+    const launchpads = this.grid.buildings.filter(b => b.type === 'launchpad');
+    launchpads.forEach(launchpad => this.processLaunchpad(launchpad, deltaSec));
 
 
     this.rateTimer += deltaSec;
@@ -56,7 +60,7 @@ export class FactoryEngine {
     const rate = (drill.def.miningRate || 1.0) * (pDemand > 0 ? powerEff : 1.0);
     drill.craftProgress = (drill.craftProgress || 0) + rate * deltaSec;
 
-    if (drill.craftProgress >= 1.0) {
+    while (drill.craftProgress >= 1.0) {
       drill.craftProgress -= 1.0;
       
       const ejected = this.ejectItemFromBuilding(drill, targetOre);
@@ -65,6 +69,7 @@ export class FactoryEngine {
         this.trackProduction(targetOre, 1);
       } else {
         drill.craftProgress = 1.0;
+        break;
       }
     }
   }
@@ -87,7 +92,7 @@ export class FactoryEngine {
 
     let outputSpace = true;
     for (const output of recipe.outputs) {
-      if ((proc.outputs[output.item] || 0) >= 50) {
+      if ((proc.outputs[output.item] || 0) + output.count > 50) {
         outputSpace = false;
         break;
       }
@@ -98,8 +103,11 @@ export class FactoryEngine {
       const progressDelta = (deltaSec * speedMult * powerEff) / recipe.duration;
       proc.craftProgress += progressDelta;
 
-      if (proc.craftProgress >= 1.0) {
-        proc.craftProgress = 0.0;
+      while (proc.craftProgress >= 1.0) {
+        const canCraft = recipe.inputs.every(input => (proc.inputs[input.item] || 0) >= input.count) &&
+          recipe.outputs.every(output => (proc.outputs[output.item] || 0) + output.count <= 50);
+        if (!canCraft) break;
+        proc.craftProgress -= 1.0;
 
         for (const input of recipe.inputs) {
           proc.inputs[input.item] -= input.count;
@@ -138,12 +146,19 @@ export class FactoryEngine {
   }
 
   processLaunchpad(launchpad, deltaSec) {
+    const current = this.milestoneManager.getCurrentMilestone();
+    if (!current) return;
     for (const itemKey of Object.keys(launchpad.inputs)) {
       const count = launchpad.inputs[itemKey];
-      if (count > 0) {
-        this.milestoneManager.deliverItem(itemKey, count);
-        this.trackConsumption(itemKey, count);
-        delete launchpad.inputs[itemKey];
+      if (count > 0 && current.deliveries.some(delivery => delivery.item === itemKey)) {
+        const delivered = this.milestoneManager.deliverItem(itemKey, count);
+        if (delivered > 0) {
+          launchpad.inputs[itemKey] -= delivered;
+          this.trackConsumption(itemKey, delivered);
+          if (this.economy) this.economy.sellItems({ [itemKey]: delivered }, 1.25);
+        }
+        if ((launchpad.inputs[itemKey] || 0) <= 0) delete launchpad.inputs[itemKey];
+        if (this.milestoneManager.getCurrentMilestone().id !== current.id) break;
       }
     }
   }

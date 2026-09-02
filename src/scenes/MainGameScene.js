@@ -244,7 +244,7 @@ export class MainGameScene extends Phaser.Scene {
           if (b) {
             if (!this.wireStartBuilding) {
               if (!this.grid.canTransmitPower(b)) {
-                if (this.uiManager) this.uiManager.showToast('Start cables from a power pole or generator.', 'warn');
+                if (this.uiManager) this.uiManager.showToast('Start cables from a generator, pole, or accumulator output.', 'warn');
               } else {
                 this.wireStartBuilding = b;
                 audioManager.playUiClick();
@@ -379,10 +379,27 @@ export class MainGameScene extends Phaser.Scene {
   demolishAt(gx, gy) {
     const b = this.grid.getBuildingAt(gx, gy);
     if (b) {
+      if (b.isStarterHub) {
+        if (this.uiManager) this.uiManager.showToast('The Central Delivery Station is a protected mission facility.', 'warn');
+        return;
+      }
+      const recoveredItems = {};
+      [b.inputs, b.outputs].forEach(inventory => {
+        Object.entries(inventory || {}).forEach(([item, count]) => {
+          recoveredItems[item] = (recoveredItems[item] || 0) + count;
+        });
+      });
+      (b.conveyorItems || []).forEach(item => {
+        recoveredItems[item.item] = (recoveredItems[item.item] || 0) + 1;
+      });
       const refund = this.economy.refundBuilding(b);
+      const cargoValue = this.economy.sellItems(recoveredItems);
       this.grid.removeBuilding(b);
       audioManager.playDemolish();
-      if (this.uiManager) this.uiManager.refreshEconomy(refund);
+      if (this.uiManager) {
+        this.uiManager.refreshEconomy(refund);
+        if (cargoValue > 0) this.uiManager.showToast(`Recovered cargo liquidated for ${this.economy.format(cargoValue)}.`, 'info');
+      }
       if (this.selectedBuilding === b) {
         this.selectedBuilding = null;
         if (this.uiManager) this.uiManager.inspectBuilding(null);
