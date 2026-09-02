@@ -1,7 +1,7 @@
 export class SaveManager {
   static SAVE_KEY = 'aetheria_factory_save';
 
-  static save(grid, milestoneManager) {
+  static save(grid, milestoneManager, economy) {
     try {
       const data = {
         version: 1,
@@ -14,6 +14,7 @@ export class SaveManager {
           unlockedRecipes: Array.from(milestoneManager.unlockedRecipes),
           unlockedItems: Array.from(milestoneManager.unlockedItems)
         },
+        economy: economy ? economy.getSnapshot() : null,
         buildings: grid.buildings.map(b => ({
           type: b.type,
           x: b.x,
@@ -43,24 +44,26 @@ export class SaveManager {
     }
   }
 
-  static load(grid, milestoneManager) {
+  static load(grid, milestoneManager, economy) {
     try {
       const raw = localStorage.getItem(this.SAVE_KEY);
       if (!raw) return { success: false, message: 'No save data found.' };
 
       const data = JSON.parse(raw);
-      return this.applySaveData(data, grid, milestoneManager);
+      return this.applySaveData(data, grid, milestoneManager, economy);
     } catch (err) {
       console.error('Failed to load game:', err);
       return { success: false, message: 'Corrupted save file: ' + err.message };
     }
   }
 
-  static applySaveData(data, grid, milestoneManager) {
+  static applySaveData(data, grid, milestoneManager, economy) {
     while (grid.buildings.length > 0) {
       grid.removeBuilding(grid.buildings[0]);
     }
     grid.wires = [];
+
+    if (economy) economy.restore(data.economy);
 
     if (data.milestones) {
       milestoneManager.currentMilestoneIndex = data.milestones.currentIndex || 1;
@@ -99,8 +102,8 @@ export class SaveManager {
     return { success: true, message: 'Sector restored successfully.' };
   }
 
-  static exportJSON(grid, milestoneManager) {
-    const res = this.save(grid, milestoneManager);
+  static exportJSON(grid, milestoneManager, economy) {
+    const res = this.save(grid, milestoneManager, economy);
     if (!res.success) return;
 
     const raw = localStorage.getItem(this.SAVE_KEY);
@@ -113,12 +116,12 @@ export class SaveManager {
     URL.revokeObjectURL(url);
   }
 
-  static importJSON(file, grid, milestoneManager, callback) {
+  static importJSON(file, grid, milestoneManager, economy, callback) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const data = JSON.parse(e.target.result);
-        const res = this.applySaveData(data, grid, milestoneManager);
+        const res = this.applySaveData(data, grid, milestoneManager, economy);
         if (callback) callback(res);
       } catch (err) {
         if (callback) callback({ success: false, message: 'Invalid JSON file: ' + err.message });

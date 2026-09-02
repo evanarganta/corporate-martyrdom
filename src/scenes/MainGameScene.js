@@ -12,6 +12,7 @@ export class MainGameScene extends Phaser.Scene {
     this.logistics = null;
     this.factory = null;
     this.milestoneManager = null;
+    this.economy = null;
     this.uiManager = null;
 
     this.activeTool = null;
@@ -42,6 +43,7 @@ export class MainGameScene extends Phaser.Scene {
     this.logistics = data.logistics;
     this.factory = data.factory;
     this.milestoneManager = data.milestoneManager;
+    this.economy = data.economy;
   }
 
   create() {
@@ -259,11 +261,17 @@ export class MainGameScene extends Phaser.Scene {
                 audioManager.playDemolish();
                 if (this.uiManager) this.uiManager.showToast('Power cable removed.', 'info');
               } else {
+                const cableCost = this.economy.getBuildingCost(BUILDINGS.wire_tool);
+                if (!this.economy.canAfford(cableCost)) {
+                  if (this.uiManager) this.uiManager.showToast(`Insufficient credits for cable: ${this.economy.format(cableCost)} required.`, 'warn');
+                  return;
+                }
                 const wire = this.grid.addWire(this.wireStartBuilding, b);
                 if (wire) {
-                audioManager.playPlace();
-                if (this.uiManager) this.uiManager.showToast(`Linked ${this.wireStartBuilding.def.name} to ${b.def.name}!`, 'success');
-                this.wireStartBuilding = null;
+                  this.economy.spend(cableCost);
+                  audioManager.playPlace();
+                  if (this.uiManager) this.uiManager.showToast(`Cable installed for ${this.economy.format(cableCost)}.`, 'success');
+                  this.wireStartBuilding = null;
                 } else {
                   if (this.uiManager) this.uiManager.showToast('Target is outside this power connection\'s range.', 'warn');
                 }
@@ -352,10 +360,18 @@ export class MainGameScene extends Phaser.Scene {
     const bDef = BUILDINGS[this.activeTool];
     if (!bDef) return;
 
+    const cost = this.economy.getBuildingCost(bDef);
+    if (!this.economy.canAfford(cost)) {
+      if (this.uiManager) this.uiManager.showToast(`Insufficient credits: ${this.economy.format(cost)} required for ${bDef.name}.`, 'warn');
+      return;
+    }
+
     if (this.grid.canPlaceBuilding(this.activeTool, gx, gy)) {
       const inst = this.grid.placeBuilding(this.activeTool, gx, gy, this.placementDirection);
       if (inst) {
+        this.economy.spend(cost);
         audioManager.playPlace();
+        if (this.uiManager) this.uiManager.refreshEconomy();
       }
     }
   }
@@ -363,8 +379,10 @@ export class MainGameScene extends Phaser.Scene {
   demolishAt(gx, gy) {
     const b = this.grid.getBuildingAt(gx, gy);
     if (b) {
+      const refund = this.economy.refundBuilding(b);
       this.grid.removeBuilding(b);
       audioManager.playDemolish();
+      if (this.uiManager) this.uiManager.refreshEconomy(refund);
       if (this.selectedBuilding === b) {
         this.selectedBuilding = null;
         if (this.uiManager) this.uiManager.inspectBuilding(null);
@@ -397,10 +415,17 @@ export class MainGameScene extends Phaser.Scene {
       });
     }
 
-    toRemove.forEach(b => this.grid.removeBuilding(b));
+    let refund = 0;
+    toRemove.forEach(b => {
+      refund += this.economy.refundBuilding(b);
+      this.grid.removeBuilding(b);
+    });
     audioManager.playDemolish();
     this.selectedBuilding = null;
-    if (this.uiManager) this.uiManager.inspectBuilding(null);
+    if (this.uiManager) {
+      this.uiManager.inspectBuilding(null);
+      this.uiManager.refreshEconomy(refund);
+    }
   }
 
   getWireAtWorldPoint(worldX, worldY) {

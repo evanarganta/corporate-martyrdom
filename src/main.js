@@ -6,6 +6,7 @@ import { LogisticsEngine } from './simulation/LogisticsEngine.js';
 import { FactoryEngine } from './simulation/FactoryEngine.js';
 import { MilestoneManager } from './simulation/MilestoneManager.js';
 import { SaveManager } from './simulation/SaveManager.js';
+import { EconomyManager } from './simulation/EconomyManager.js';
 import { UIManager } from './ui/UIManager.js';
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -13,11 +14,12 @@ window.addEventListener('DOMContentLoaded', () => {
   const powerGrid = new PowerGrid(grid);
   const logistics = new LogisticsEngine(grid);
   const milestoneManager = new MilestoneManager();
+  const economy = new EconomyManager();
   const factory = new FactoryEngine(grid, logistics, milestoneManager);
 
   const hasSave = localStorage.getItem(SaveManager.SAVE_KEY);
   if (hasSave) {
-    SaveManager.load(grid, milestoneManager);
+    SaveManager.load(grid, milestoneManager, economy);
   } else {
     const drill = grid.placeBuilding('burner_drill', 53, 54, 1);
     
@@ -78,12 +80,13 @@ window.addEventListener('DOMContentLoaded', () => {
     powerGrid,
     logistics,
     factory,
-    milestoneManager
+    milestoneManager,
+    economy
   });
 
   const game = new Phaser.Game(config);
 
-  const uiManager = new UIManager(sceneInstance, grid, powerGrid, logistics, factory, milestoneManager);
+  const uiManager = new UIManager(sceneInstance, grid, powerGrid, logistics, factory, milestoneManager, economy);
   sceneInstance.uiManager = uiManager;
 
   window.addEventListener('resize', () => {

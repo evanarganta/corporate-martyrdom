@@ -545,6 +545,18 @@ table {
   transform: none;
 }
 
+.hotbar-slot.unaffordable {
+  opacity: 0.52;
+  border-color: rgba(239, 68, 68, 0.42);
+  cursor: not-allowed;
+}
+
+.hotbar-slot.unaffordable:hover {
+  border-color: rgba(239, 68, 68, 0.42);
+  background: var(--bg-slot);
+  transform: none;
+}
+
 .slot-icon-image {
   width: 28px;
   height: 28px;
@@ -1638,6 +1650,13 @@ button:focus-visible {
   text-transform: uppercase;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.slot-cost {
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
 }
 
 .delivery-station-inspector .inspector-machine-glyph {

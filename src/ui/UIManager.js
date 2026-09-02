@@ -3,13 +3,14 @@ import { audioManager } from '../core/AudioManager.js';
 import { SaveManager } from '../simulation/SaveManager.js';
 
 export class UIManager {
-  constructor(scene, grid, powerGrid, logistics, factory, milestoneManager) {
+  constructor(scene, grid, powerGrid, logistics, factory, milestoneManager, economy) {
     this.scene = scene;
     this.grid = grid;
     this.powerGrid = powerGrid;
     this.logistics = logistics;
     this.factory = factory;
     this.milestoneManager = milestoneManager;
+    this.economy = economy;
 
     this.currentCategory = 'logistics';
     this.inspectedBuilding = null;
@@ -24,6 +25,7 @@ export class UIManager {
     this.statPowerVal = document.getElementById('stat-power-val');
     this.powerFillMini = document.getElementById('power-fill-mini');
     this.statResearchVal = document.getElementById('stat-research-val');
+    this.statCreditsVal = document.getElementById('stat-credits-val');
 
     this.placementBanner = document.getElementById('placement-guide-banner');
     this.placementActiveName = document.getElementById('placement-active-name');
@@ -141,6 +143,7 @@ export class UIManager {
           const count = Math.floor(b.inputs[itemKey]);
           if (count > 0) {
             this.milestoneManager.deliverItem(itemKey, count);
+            this.economy.sellItems({ [itemKey]: count }, 1.25);
             deliveredTotal += count;
             b.inputs[itemKey] = 0;
           }
@@ -151,10 +154,26 @@ export class UIManager {
         audioManager.playUiClick();
         this.updateInspectorContent();
         this.updateMilestoneTracker();
-        this.showToast(`Delivered +${deliveredTotal} items to Phase Objective!`, 'success');
+        this.refreshEconomy();
+        this.showToast(`Delivered +${deliveredTotal} items and earned contract credits.`, 'success');
       } else {
         this.showToast('No items in Delivery Station matching active objective.', 'info');
       }
+    });
+
+    document.getElementById('btn-inspector-sell').addEventListener('click', () => {
+      if (!this.inspectedBuilding || this.inspectedBuilding.type !== 'launchpad') return;
+      const inventory = this.inspectedBuilding.inputs;
+      const payout = this.economy.sellItems(inventory);
+      if (payout <= 0) {
+        this.showToast('No sellable cargo in the Delivery Station.', 'info');
+        return;
+      }
+      this.inspectedBuilding.inputs = {};
+      audioManager.playUiClick();
+      this.updateInspectorContent();
+      this.refreshEconomy();
+      this.showToast(`Cargo sold for ${this.economy.format(payout)}.`, 'success');
     });
 
     document.getElementById('btn-inspector-flush').addEventListener('click', () => {
@@ -228,29 +247,31 @@ export class UIManager {
     });
 
     document.getElementById('btn-save-game').addEventListener('click', () => {
-      const res = SaveManager.save(this.grid, this.milestoneManager);
+      const res = SaveManager.save(this.grid, this.milestoneManager, this.economy);
       this.showToast(res.message, res.success ? 'success' : 'error');
     });
 
     document.getElementById('btn-load-game').addEventListener('click', () => {
-      const res = SaveManager.load(this.grid, this.milestoneManager);
+      const res = SaveManager.load(this.grid, this.milestoneManager, this.economy);
       this.showToast(res.message, res.success ? 'success' : 'error');
       this.renderHotbar();
       this.updateMilestoneTracker();
+      this.refreshEconomy();
     });
 
     document.getElementById('btn-export-save').addEventListener('click', () => {
-      SaveManager.exportJSON(this.grid, this.milestoneManager);
+      SaveManager.exportJSON(this.grid, this.milestoneManager, this.economy);
     });
 
     const fileInput = document.getElementById('file-import-save');
     document.getElementById('btn-import-save').addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
-        SaveManager.importJSON(e.target.files[0], this.grid, this.milestoneManager, (res) => {
+        SaveManager.importJSON(e.target.files[0], this.grid, this.milestoneManager, this.economy, (res) => {
           this.showToast(res.message, res.success ? 'success' : 'error');
           this.renderHotbar();
           this.updateMilestoneTracker();
+          this.refreshEconomy();
         });
       }
     });
@@ -327,7 +348,8 @@ export class UIManager {
     const buildingsInCat = this.getBuildingsInCurrentCategory();
     if (index >= 0 && index < buildingsInCat.length) {
       const b = buildingsInCat[index];
-      if (this.milestoneManager.isBuildingUnlocked(b.id)) {
+      const cost = this.economy.getBuildingCost(b);
+      if (this.milestoneManager.isBuildingUnlocked(b.id) && this.economy.canAfford(cost)) {
         if (this.scene.activeTool === b.id) {
           this.scene.setTool(null);
         } else {
@@ -335,6 +357,8 @@ export class UIManager {
         }
         this.renderHotbar();
         audioManager.playUiClick();
+      } else if (this.milestoneManager.isBuildingUnlocked(b.id)) {
+        this.showToast(`Insufficient credits: ${this.economy.format(cost)} required for ${b.name}.`, 'warn');
       }
     }
   }
@@ -364,18 +388,21 @@ export class UIManager {
     buildingsInCat.forEach((b, idx) => {
       const isUnlocked = this.milestoneManager.isBuildingUnlocked(b.id);
       const slot = document.createElement('div');
-      slot.className = `hotbar-slot ${isUnlocked ? '' : 'locked'} ${this.scene.activeTool === b.id ? 'active' : ''}`;
-      slot.title = `${b.name} [${idx + 1}]\nPower: ${b.powerDemand > 0 ? b.powerDemand + ' kW' : (b.powerOutput > 0 ? '+' + b.powerOutput + ' kW' : 'Passive')}`;
+      const cost = this.economy.getBuildingCost(b);
+      const isAffordable = this.economy.canAfford(cost);
+      slot.className = `hotbar-slot ${isUnlocked ? '' : 'locked'} ${isAffordable ? '' : 'unaffordable'} ${this.scene.activeTool === b.id ? 'active' : ''}`;
+      slot.title = `${b.name} [${idx + 1}]\nCost: ${this.economy.format(cost)}\nPower: ${b.powerDemand > 0 ? b.powerDemand + ' kW' : (b.powerOutput > 0 ? '+' + b.powerOutput + ' kW' : 'Passive')}`;
 
       slot.innerHTML = `
         <div class="slot-icon-image">${b.iconSvg}</div>
         <div class="slot-text-wrap">
           <span class="slot-key-tag">${idx + 1}</span>
           <span class="slot-name-full">${b.name}</span>
+          <span class="slot-cost">${this.economy.format(cost)}</span>
         </div>
       `;
 
-      if (isUnlocked) {
+      if (isUnlocked && isAffordable) {
         slot.addEventListener('click', () => {
           if (this.scene.activeTool === b.id) {
             this.scene.setTool(null);
@@ -457,6 +484,10 @@ export class UIManager {
       this.statResearchVal.textContent = `${this.milestoneManager.researchPoints}`;
     }
 
+    if (this.statCreditsVal) {
+      this.statCreditsVal.textContent = this.economy.format();
+    }
+
     if (this.inspectedBuilding) {
       this.updateInspectorContent();
     }
@@ -495,6 +526,12 @@ export class UIManager {
     const pct = totalNeeded > 0 ? Math.min(100, Math.round((totalDelivered / totalNeeded) * 100)) : 100;
     this.trackerProgressFill.style.width = `${pct}%`;
     this.trackerProgressText.textContent = `${totalDelivered} / ${totalNeeded}`;
+  }
+
+  refreshEconomy(refund = 0) {
+    this.updateHUD();
+    this.renderHotbar();
+    if (refund > 0) this.showToast(`Dismantled for ${this.economy.format(refund)} refund.`, 'info');
   }
 
   inspectBuilding(building) {
@@ -807,6 +844,7 @@ export class UIManager {
                 const toTake = Math.min(stillNeeded, available);
                 lp.inputs[d.item] -= toTake;
                 this.milestoneManager.deliverItem(d.item, toTake);
+                this.economy.sellItems({ [d.item]: toTake }, 1.25);
                 stillNeeded -= toTake;
                 totalDelivered += toTake;
                 if (stillNeeded <= 0) break;
@@ -818,7 +856,8 @@ export class UIManager {
             audioManager.playUiClick();
             this.renderTechTree(activeTier);
             this.updateMilestoneTracker();
-            this.showToast(`Delivered +${totalDelivered} items from Hub to Phase Objective!`, 'success');
+            this.refreshEconomy();
+            this.showToast(`Delivered +${totalDelivered} items and earned contract credits.`, 'success');
           } else {
             this.showToast('No matching items currently stored in the Delivery Station Hub.', 'warn');
           }
