@@ -10,16 +10,12 @@
   <link rel="stylesheet" href="/src/index.css">
 </head>
 <body class="theme-dark select-none">
-  <!-- Main Game Canvas Container -->
   <div id="game-container"></div>
 
-  <!-- UI Overlay System -->
   <div id="ui-overlay">
     
-    <!-- Top Bar -->
     <header class="hud-header glass-panel">
       <div class="hud-left stats-ticker">
-        <!-- Power Gauge -->
         <div class="stat-pill" title="Power Grid Supply / Demand">
           <span class="stat-label">Power</span>
           <span id="stat-power-val" class="stat-value text-power">0 kW</span>
@@ -28,7 +24,6 @@
           </div>
         </div>
 
-        <!-- Research Counter -->
         <div class="stat-pill" title="Research Points">
           <span class="stat-label">Research</span>
           <span id="stat-research-val" class="stat-value text-amber">0</span>
@@ -47,9 +42,6 @@
         </div>
 
       <div class="hud-right">
-        <!-- Game Speed Controls -->
-
-        <!-- Menu Action Buttons -->
         <button id="btn-toggle-milestones" class="btn-action" title="Milestones (T)">Research</button>
         <button id="btn-toggle-stats" class="btn-action" title="Production Statistics (P)">Analytics</button>
         <button id="btn-toggle-blueprints" class="btn-action" title="Save & System (B)">Save</button>
@@ -58,7 +50,6 @@
       </div>
     </header>
 
-    <!-- Milestone Tracker Widget (Top Right) -->
     <div id="milestone-tracker-card" class="glass-panel floating-card">
       <div class="card-header">
         <span class="badge-tier" id="tracker-tier-badge">PHASE 1</span>
@@ -66,8 +57,7 @@
       </div>
       <div class="card-body">
         <div id="tracker-deliveries" class="delivery-items-list">
-          <!-- Dynamic delivery goals -->
-        </div>
+          </div>
         <div class="tracker-progress-bar">
           <div id="tracker-progress-fill" style="width: 0%"></div>
         </div>
@@ -78,7 +68,6 @@
       </div>
     </div>
 
-    <!-- Active Placement Banner (Center Bottom above Hotbar) -->
     <div id="placement-guide-banner" class="placement-banner hidden">
       <span class="placement-key-hint" id="placement-confirm-hint"><kbd>E</kbd> / <kbd>Click</kbd> Build</span>
       <span class="placement-key-hint" id="placement-rotate-hint"><kbd>R</kbd> Rotate</span>
@@ -86,9 +75,7 @@
       <span class="placement-key-hint"><kbd>Q</kbd> Cancel</span>
     </div>
 
-    <!-- Building Hotbar (Bottom Center) -->
     <div id="bottom-hud">
-      <!-- Category Tabs (Side-by-side Z, X, C, V, B, and Demolish Q) -->
       <div class="category-tabs glass-panel">
         <button class="cat-btn active" data-category="logistics">
           <span class="cat-label">Logistics</span>
@@ -116,13 +103,10 @@
         </button>
       </div>
 
-      <!-- Hotbar Slots -->
       <div id="hotbar-items-container" class="hotbar-slots glass-panel">
-        <!-- Populated dynamically -->
-      </div>
+        </div>
     </div>
 
-    <!-- Machine Inspector Panel -->
     <div id="inspector-panel" class="glass-panel modal-panel hidden">
       <div class="panel-header">
         <div class="header-left">
@@ -133,7 +117,6 @@
       </div>
 
       <div class="panel-content">
-        <!-- Compact power telemetry -->
         <div class="inspector-power-grid">
           <div class="inspector-section inspector-stat-card">
             <div id="inspector-grid-label" class="section-label">GRID SATISFACTION</div>
@@ -146,7 +129,6 @@
           </div>
         </div>
 
-        <!-- Recipe Selector -->
         <div id="inspector-recipe-section" class="inspector-section">
           <div class="section-label">ACTIVE RECIPE</div>
           <div class="recipe-selector-current" id="recipe-current-display">
@@ -154,8 +136,7 @@
             <button id="btn-change-recipe" class="btn-sm">Configure</button>
           </div>
           <div id="recipe-select-dropdown" class="recipe-dropdown hidden">
-            <!-- Dynamic recipes -->
-          </div>
+            </div>
         </div>
 
         <div class="buffer-cycle-dashboard">
@@ -174,7 +155,6 @@
           </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="inspector-actions">
           <button id="btn-inspector-flush" class="btn-secondary btn-sm">Flush Buffers</button>
           <button id="btn-inspector-demolish-line" class="btn-danger btn-sm hidden">Remove Line</button>
@@ -188,7 +168,6 @@
       </div>
     </div>
 
-    <!-- Research Matrix Modal -->
     <div id="modal-milestones" class="modal-backdrop hidden">
       <div class="modal-window glass-panel modal-lg">
         <div class="modal-header">
@@ -206,7 +185,6 @@
       </div>
     </div>
 
-    <!-- Production Statistics Modal -->
     <div id="modal-stats" class="modal-backdrop hidden">
       <div class="modal-window glass-panel modal-md">
         <div class="modal-header">
@@ -256,7 +234,6 @@
       </div>
     </div>
 
-    <!-- Save / Blueprints Modal -->
     <div id="modal-blueprints" class="modal-backdrop hidden">
       <div class="modal-window glass-panel modal-sm">
         <div class="modal-header">
@@ -279,7 +256,6 @@
       </div>
     </div>
 
-    <!-- Help Modal -->
     <div id="modal-help" class="modal-backdrop hidden">
       <div class="modal-window glass-panel modal-md">
         <div class="modal-header">
@@ -323,7 +299,6 @@
       </div>
     </div>
 
-    <!-- Universal Confirmation Dialog Modal -->
     <div id="modal-confirm" class="modal-backdrop hidden">
       <div class="confirm-box glass-panel modal-sm">
         <h4 id="confirm-title">Confirm Action</h4>
@@ -335,7 +310,6 @@
       </div>
     </div>
 
-    <!-- Notification Toast Container -->
     <div id="toast-container"></div>
   </div>
 

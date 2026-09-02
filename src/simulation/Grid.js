@@ -5,35 +5,28 @@ export class Grid {
     this.width = width;
     this.height = height;
     
-    // Matrix of tiles: { type: 'ground' | 'concrete', ore: null | 'iron_ore' | 'copper_ore' | 'coal' | 'quartz' | 'titanium_ore', oreYield: 0 }
     this.tiles = Array.from({ length: height }, () => Array.from({ length: width }, () => ({
       type: 'ground',
       ore: null,
       oreYield: 0
     })));
 
-    // Matrix of building references at each tile
     this.buildingGrid = Array.from({ length: height }, () => Array.from({ length: width }, () => null));
     
-    // List of all active building instances
     this.buildings = [];
     
-    // Explicit wire network connections: [{ id, fromId, toId, x1, y1, x2, y2 }]
     this.wires = [];
 
     this.generateWorldOres();
   }
 
   generateWorldOres() {
-    // Generate organic clusters of ores around the map
     const clusters = [
-      // Starter area veins (near center: 60, 60)
       { type: 'iron_ore', cx: 54, cy: 55, radius: 5, density: 0.8 },
       { type: 'copper_ore', cx: 66, cy: 54, radius: 4, density: 0.8 },
       { type: 'coal', cx: 55, cy: 66, radius: 5, density: 0.75 },
       { type: 'quartz', cx: 68, cy: 67, radius: 4, density: 0.7 },
       
-      // Outer expansion veins
       { type: 'iron_ore', cx: 35, cy: 35, radius: 7, density: 0.85 },
       { type: 'copper_ore', cx: 85, cy: 35, radius: 6, density: 0.85 },
       { type: 'coal', cx: 35, cy: 85, radius: 6, density: 0.85 },
@@ -71,7 +64,6 @@ export class Grid {
       return false;
     }
 
-    // Check if any occupied tile overlaps
     for (let dy = 0; dy < bDef.height; dy++) {
       for (let dx = 0; dx < bDef.width; dx++) {
         if (this.buildingGrid[gridY + dy][gridX + dx] !== null) {
@@ -97,21 +89,17 @@ export class Grid {
       height: bDef.height,
       direction: direction,
       
-      // Simulation state
       active: true,
-      powerSatisfied: (bDef.powerDemand && bDef.powerDemand > 0) ? 0.0 : 1.0, // 0.0 to 1.0
+      powerSatisfied: (bDef.powerDemand && bDef.powerDemand > 0) ? 0.0 : 1.0,
       craftProgress: 0.0,
       recipeId: null,
       
-      // Inventory buffers
-      inputs: {},  // { itemKey: count }
-      outputs: {}, // { itemKey: count }
+      inputs: {},
+      outputs: {},
 
-      // Logistics specifics (e.g. for belts / splitters)
-      conveyorItems: [], // [{ item: 'iron_ore', progress: 0.0 }]
+      conveyorItems: [],
       splitterIndex: 0,
       
-      // Telemetry
       stats: {
         producedTotal: 0,
         consumedTotal: 0,
@@ -119,14 +107,12 @@ export class Grid {
       }
     };
 
-    // Auto-assign default recipe if smelter or assembler
     if (buildingId === 'smelter_mk1' || buildingId === 'smelter_mk2') {
       buildingInstance.recipeId = 'smelt_iron';
     } else if (buildingId === 'assembler_mk1' || buildingId === 'assembler_mk2') {
       buildingInstance.recipeId = 'craft_iron_plate';
     }
 
-    // Register on building occupancy grid
     for (let dy = 0; dy < bDef.height; dy++) {
       for (let dx = 0; dx < bDef.width; dx++) {
         this.buildingGrid[gridY + dy][gridX + dx] = buildingInstance;
@@ -140,7 +126,6 @@ export class Grid {
   removeBuilding(buildingInstance) {
     if (!buildingInstance) return false;
 
-    // Clear occupancy grid
     for (let dy = 0; dy < buildingInstance.height; dy++) {
       for (let dx = 0; dx < buildingInstance.width; dx++) {
         const gx = buildingInstance.x + dx;
@@ -156,7 +141,6 @@ export class Grid {
     const idx = this.buildings.indexOf(buildingInstance);
     if (idx !== -1) {
       this.buildings.splice(idx, 1);
-      // Remove all wires connected to this building
       this.removeWiresForBuilding(buildingInstance);
       return true;
     }
@@ -166,11 +150,8 @@ export class Grid {
   addWire(b1, b2) {
     if (!b1 || !b2 || b1 === b2) return null;
 
-    // Cables must originate from power infrastructure. Machines may receive
-    // power, but they cannot be used to relay it to another machine.
     if (!this.canTransmitPower(b1) || !this.canConnectToPower(b2)) return null;
     
-    // Check if wire between these two already exists
     const existing = this.getWireBetween(b1, b2);
     if (existing) return existing;
 

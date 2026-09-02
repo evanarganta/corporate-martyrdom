@@ -21,22 +21,18 @@ export class UIManager {
   }
 
   initDOM() {
-    // Header Stats
     this.statPowerVal = document.getElementById('stat-power-val');
     this.powerFillMini = document.getElementById('power-fill-mini');
     this.statResearchVal = document.getElementById('stat-research-val');
 
-    // Placement Banner
     this.placementBanner = document.getElementById('placement-guide-banner');
     this.placementActiveName = document.getElementById('placement-active-name');
     this.placementConfirmHint = document.getElementById('placement-confirm-hint');
     this.placementRotateHint = document.getElementById('placement-rotate-hint');
 
-    // Hotbar
     this.hotbarContainer = document.getElementById('hotbar-items-container');
     this.catBtns = document.querySelectorAll('.cat-btn');
 
-    // Inspector
     this.inspectorPanel = document.getElementById('inspector-panel');
     this.inspectorTitle = document.getElementById('inspector-title');
     this.inspectorStatus = document.getElementById('inspector-status');
@@ -58,14 +54,12 @@ export class UIManager {
     this.inspectorCycleTime = document.getElementById('inspector-cycle-time');
     this.inspectorCycleRing = document.getElementById('inspector-cycle-ring');
 
-    // Milestone Tracker
     this.trackerTierBadge = document.getElementById('tracker-tier-badge');
     this.trackerTitle = document.getElementById('tracker-title');
     this.trackerDeliveries = document.getElementById('tracker-deliveries');
     this.trackerProgressFill = document.getElementById('tracker-progress-fill');
     this.trackerProgressText = document.getElementById('tracker-progress-text');
 
-    // Modals
     this.modalMilestones = document.getElementById('modal-milestones');
     this.modalStats = document.getElementById('modal-stats');
     this.modalBlueprints = document.getElementById('modal-blueprints');
@@ -74,7 +68,6 @@ export class UIManager {
   }
 
   bindEvents() {
-    // Category Tabs (Z, X, C, V, B, and Demolish N)
     this.catBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const cat = btn.dataset.category;
@@ -94,7 +87,6 @@ export class UIManager {
       });
     });
 
-    // Speed Controls
     const speedMap = {
       'btn-speed-pause': 0.0,
       'btn-speed-1x': 1.0,
@@ -110,37 +102,31 @@ export class UIManager {
       });
     });
 
-    // Top Modal Toggles
     document.getElementById('btn-toggle-milestones').addEventListener('click', () => this.openModal(this.modalMilestones, () => this.renderTechTree(0)));
     document.getElementById('btn-open-launchpad').addEventListener('click', () => this.openModal(this.modalMilestones, () => this.renderTechTree(0)));
     document.getElementById('btn-toggle-stats').addEventListener('click', () => this.openModal(this.modalStats, () => this.renderAnalytics()));
     document.getElementById('btn-toggle-blueprints').addEventListener('click', () => this.openModal(this.modalBlueprints));
     document.getElementById('btn-help').addEventListener('click', () => this.openModal(this.modalHelp));
 
-    // Audio Toggle
     document.getElementById('btn-toggle-audio').addEventListener('click', (e) => {
       const isEnabled = audioManager.toggleSound();
       e.target.textContent = isEnabled ? 'SND' : 'MUT';
     });
 
-    // Modal Close Buttons
     document.querySelectorAll('.modal-close-btn').forEach(btn => {
       btn.addEventListener('click', () => this.closeAllModals());
     });
 
-    // Close Modals on backdrop click
     document.querySelectorAll('.modal-backdrop').forEach(mb => {
       mb.addEventListener('click', (e) => {
         if (e.target === mb) this.closeAllModals();
       });
     });
 
-    // Inspector Close
     document.getElementById('btn-close-inspector').addEventListener('click', () => {
       this.inspectBuilding(null);
     });
 
-    // Submit items to Phase Objectives (Delivery Station only)
     document.getElementById('btn-inspector-submit').addEventListener('click', () => {
       if (!this.inspectedBuilding || this.inspectedBuilding.type !== 'launchpad') return;
       const b = this.inspectedBuilding;
@@ -150,7 +136,6 @@ export class UIManager {
 
       const eligibleItems = curMilestone.deliveries.map(d => d.item);
 
-      // Check inputs of the delivery station
       Object.keys(b.inputs).forEach(itemKey => {
         if (eligibleItems.includes(itemKey) && b.inputs[itemKey] > 0) {
           const count = Math.floor(b.inputs[itemKey]);
@@ -172,7 +157,6 @@ export class UIManager {
       }
     });
 
-    // Inspector Flush & Demolish
     document.getElementById('btn-inspector-flush').addEventListener('click', () => {
       if (this.inspectedBuilding) {
         this.showConfirmDialog(
@@ -190,7 +174,6 @@ export class UIManager {
       }
     });
 
-    // Single Dismantle with Confirmation
     document.getElementById('btn-inspector-demolish').addEventListener('click', () => {
       if (this.inspectedBuilding) {
         const b = this.inspectedBuilding;
@@ -204,7 +187,6 @@ export class UIManager {
       }
     });
 
-    // Bulk Dismantle Connected Line with Confirmation
     const btnLineDemolish = document.getElementById('btn-inspector-demolish-line');
     if (btnLineDemolish) {
       btnLineDemolish.addEventListener('click', () => {
@@ -222,7 +204,6 @@ export class UIManager {
       });
     }
 
-    // Confirmation Modal Buttons
     const modalConfirm = document.getElementById('modal-confirm');
     const btnConfirmOk = document.getElementById('btn-confirm-ok');
     const btnConfirmCancel = document.getElementById('btn-confirm-cancel');
@@ -242,12 +223,10 @@ export class UIManager {
       });
     }
 
-    // Inspector Recipe Dropdown Toggle
     document.getElementById('btn-change-recipe').addEventListener('click', () => {
       this.recipeSelectDropdown.classList.toggle('hidden');
     });
 
-    // Save & Load Handlers
     document.getElementById('btn-save-game').addEventListener('click', () => {
       const res = SaveManager.save(this.grid, this.milestoneManager);
       this.showToast(res.message, res.success ? 'success' : 'error');
@@ -287,7 +266,6 @@ export class UIManager {
       );
     });
 
-    // Milestone Unlock Event Listener
     window.addEventListener('milestone-unlocked', (e) => {
       const m = e.detail.milestone;
       this.showToast(`Milestone Unlocked: ${m.title}`, 'success');
@@ -351,10 +329,8 @@ export class UIManager {
       const b = buildingsInCat[index];
       if (this.milestoneManager.isBuildingUnlocked(b.id)) {
         if (this.scene.activeTool === b.id) {
-          // Pressing the same number again cancels the selected tool
           this.scene.setTool(null);
         } else {
-          // Pressing another number equips that component
           this.scene.setTool(b.id);
         }
         this.renderHotbar();
@@ -466,7 +442,6 @@ export class UIManager {
   }
 
   updateHUD(hoverTile) {
-    // Power Stats
     const supply = Math.round(this.powerGrid.totalProduction);
     const demand = Math.round(this.powerGrid.totalDemand);
     if (this.statPowerVal) {
@@ -478,12 +453,10 @@ export class UIManager {
       this.powerFillMini.style.background = sat < 80 ? '#c0392b' : '#f1c40f';
     }
 
-    // Research Points
     if (this.statResearchVal) {
       this.statResearchVal.textContent = `${this.milestoneManager.researchPoints}`;
     }
 
-    // Inspector update if open
     if (this.inspectedBuilding) {
       this.updateInspectorContent();
     }
@@ -562,7 +535,6 @@ export class UIManager {
     this.inspectorTitle.textContent = building.def.name;
     this.recipeSelectDropdown.classList.add('hidden');
 
-    // Toggle bulk remove line button for conveyors
     const btnLineDemolish = document.getElementById('btn-inspector-demolish-line');
     if (btnLineDemolish) {
       if (building.type.startsWith('conveyor')) {
@@ -572,7 +544,6 @@ export class UIManager {
       }
     }
 
-    // Toggle dedicated Delivery Station Deliver to Hub row
     const siloActionRow = document.getElementById('inspector-silo-action-row');
     if (siloActionRow) {
       if (building.type === 'launchpad') {
@@ -582,7 +553,6 @@ export class UIManager {
       }
     }
 
-    // Recipes dropdown setup
     if (isProcessor) {
       this.inspectorRecipeSection.classList.remove('hidden');
       const validRecipes = RECIPES.filter(r => r.machineType.includes(building.type) && this.milestoneManager.isRecipeUnlocked(r.id));
@@ -618,7 +588,6 @@ export class UIManager {
     const b = this.inspectedBuilding;
     if (!b) return;
 
-    // Power telemetry adapts to the facility's electrical role.
     const powerPct = Math.round(b.powerSatisfied * 100);
     const powerRole = b.def.powerOutput > 0
       ? 'producer'
@@ -690,14 +659,12 @@ export class UIManager {
       this.inspectorStatus.className = 'status-badge status-idle';
     }
 
-    // Recipe Display
     if (b.recipeId) {
       const rec = RECIPES.find(r => r.id === b.recipeId);
       this.recipeName.textContent = rec ? rec.name : b.recipeId;
       this.inspectorCycleTime.textContent = rec ? `${rec.duration}s` : '1.0s';
     }
 
-    // Input Buffers
     this.inspectorInputs.innerHTML = '';
     Object.keys(b.inputs).forEach(itemKey => {
       const count = Math.floor(b.inputs[itemKey] || 0);
@@ -717,14 +684,12 @@ export class UIManager {
       this.inspectorInputs.innerHTML = '<small class="text-dim">Empty</small>';
     }
 
-    // Craft Progress
     const craftPct = Math.min(100, Math.round(b.craftProgress * 100));
     this.inspectorCraftBar.style.width = `${craftPct}%`;
     if (this.inspectorCycleRing) {
       this.inspectorCycleRing.style.setProperty('--cycle-progress', craftPct);
     }
 
-    // Output Buffers
     this.inspectorOutputs.innerHTML = '';
     Object.keys(b.outputs).forEach(itemKey => {
       const count = Math.floor(b.outputs[itemKey] || 0);
@@ -750,7 +715,6 @@ export class UIManager {
     const tabsContainer = document.getElementById('tech-tier-tabs');
     container.innerHTML = '';
 
-    // Setup Tier Tabs
     tabsContainer.innerHTML = '';
     TECH_MILESTONES.forEach(m => {
       const btn = document.createElement('button');
@@ -763,7 +727,6 @@ export class UIManager {
       tabsContainer.appendChild(btn);
     });
 
-    // Render Milestone Cards for this Tier
     const milestonesInTier = TECH_MILESTONES.filter(m => m.tier === activeTier);
 
     milestonesInTier.forEach(m => {
@@ -774,7 +737,6 @@ export class UIManager {
       const card = document.createElement('div');
       card.className = `tech-card ${isCompleted ? 'unlocked' : (isAvailable ? 'available' : 'locked')}`;
 
-      // Build unlocks tags
       let unlocksHTML = '';
       m.unlockedBuildings.forEach(bId => {
         const b = BUILDINGS[bId];
@@ -789,7 +751,6 @@ export class UIManager {
         }
       });
 
-      // Build deliveries list
       let reqHTML = '';
       m.deliveries.forEach(d => {
         const itemDef = ITEMS[d.item] || { name: d.item, symbol: d.item, iconSvg: '' };
@@ -831,7 +792,6 @@ export class UIManager {
       const turninBtn = card.querySelector(`#btn-manual-turnin-${m.id}`);
       if (turninBtn) {
         turninBtn.addEventListener('click', () => {
-          // Strictly pull required items from Delivery Station (launchpad) input buffers only
           const launchpads = this.grid.buildings.filter(b => b.type === 'launchpad');
           let totalDelivered = 0;
           
@@ -882,7 +842,6 @@ export class UIManager {
     powerSub.textContent = `Supply: ${supply} kW / Demand: ${demand} kW`;
     powerBar.style.width = `${sat}%`;
 
-    // Render Ore extraction stats
     oreRates.innerHTML = '';
     ['iron_ore', 'copper_ore', 'coal', 'quartz', 'titanium_ore'].forEach(oreKey => {
       const itemDef = ITEMS[oreKey];
@@ -899,7 +858,6 @@ export class UIManager {
       oreRates.appendChild(div);
     });
 
-    // Render Table Rows
     ratesTbody.innerHTML = '';
     const allRates = this.factory.getProductionRates();
     Object.keys(ITEMS).forEach(itemKey => {

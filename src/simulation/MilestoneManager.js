@@ -8,25 +8,22 @@ export class MilestoneManager {
     this.currentMilestoneIndex = 0;
     this.researchPoints = 0;
     
-    // Progress for each milestone: { milestoneId: { delivered: { itemKey: count }, completed: false } }
     this.progress = {};
     this.milestones.forEach((m, idx) => {
       this.progress[m.id] = {
         delivered: {},
-        completed: idx === 0 // Tier 0 starts completed/unlocked
+        completed: idx === 0
       };
       m.deliveries.forEach(d => {
         this.progress[m.id].delivered[d.item] = 0;
       });
     });
 
-    // Unlocked sets for quick query
     this.unlockedBuildings = new Set(this.milestones[0].unlockedBuildings);
     this.unlockedBuildings.add('wire_tool');
     this.unlockedRecipes = new Set(this.milestones[0].unlockedRecipes);
     this.unlockedItems = new Set(this.milestones[0].unlockedItems);
 
-    // Initial milestone to work on is Tier 1
     this.currentMilestoneIndex = 1;
   }
 
@@ -49,16 +46,13 @@ export class MilestoneManager {
     const prog = this.progress[cur.id];
     if (!prog || prog.completed) return;
 
-    // Check if item is in requirements
     const req = cur.deliveries.find(d => d.item === itemKey);
     if (req) {
       prog.delivered[itemKey] = (prog.delivered[itemKey] || 0) + count;
-      // Award research points (10 RP per delivered tier item)
       this.researchPoints += count * 5;
       
       this.checkCompletion(cur);
     } else {
-      // General offloading to orbital market awards small RP
       this.researchPoints += count * 1;
     }
   }
@@ -84,12 +78,10 @@ export class MilestoneManager {
     const prog = this.progress[milestone.id];
     prog.completed = true;
 
-    // Unlock buildings, recipes, items
     milestone.unlockedBuildings.forEach(b => this.unlockedBuildings.add(b));
     milestone.unlockedRecipes.forEach(r => this.unlockedRecipes.add(r));
     milestone.unlockedItems.forEach(i => this.unlockedItems.add(i));
 
-    // SFX & Confetti celebration
     audioManager.playMilestoneUnlock();
     try {
       confetti({
@@ -99,7 +91,6 @@ export class MilestoneManager {
       });
     } catch (e) {}
 
-    // Advance to next milestone
     if (this.currentMilestoneIndex < this.milestones.length - 1) {
       this.currentMilestoneIndex++;
     }

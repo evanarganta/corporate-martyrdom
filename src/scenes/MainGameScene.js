@@ -7,7 +7,6 @@ export class MainGameScene extends Phaser.Scene {
   constructor() {
     super('MainGameScene');
 
-    // Core references (injected from main.js)
     this.grid = null;
     this.powerGrid = null;
     this.logistics = null;
@@ -15,15 +14,13 @@ export class MainGameScene extends Phaser.Scene {
     this.milestoneManager = null;
     this.uiManager = null;
 
-    // Interaction State
-    this.activeTool = null; // null | buildingId | 'demolish'
-    this.placementDirection = 0; // 0: UP, 1: RIGHT, 2: DOWN, 3: LEFT
+    this.activeTool = null;
+    this.placementDirection = 0;
     this.isDraggingBuild = false;
     this.lastDraggedTile = { x: -1, y: -1 };
     this.hoverTile = { x: 0, y: 0 };
     this.selectedBuilding = null;
 
-    // Graphics Layers
     this.terrainLayer = null;
     this.oreLayer = null;
     this.buildingGraphics = null;
@@ -32,11 +29,9 @@ export class MainGameScene extends Phaser.Scene {
     this.ghostGraphics = null;
     this.particleEmitter = null;
 
-    // Conveyor animation timing
     this.conveyorAnimFrame = 0;
     this.animTimer = 0;
 
-    // Simulation speed multiplier
     this.gameSpeed = 1.0;
   }
 
@@ -50,25 +45,20 @@ export class MainGameScene extends Phaser.Scene {
   }
 
   create() {
-    // 1. Generate procedural textures
     TextureGenerator.generateAll(this);
 
-    // 2. Setup World Boundaries and Camera
     const worldPixelWidth = WORLD_WIDTH * TILE_SIZE;
     const worldPixelHeight = WORLD_HEIGHT * TILE_SIZE;
     this.cameras.main.setBounds(0, 0, worldPixelWidth, worldPixelHeight);
     this.cameras.main.setZoom(1.0);
     this.cameras.main.centerOn(worldPixelWidth / 2, worldPixelHeight / 2);
 
-    // 3. Setup Layers
     this.createWorldLayers();
 
-    // 4. Input Controls
     this.setupCameraControls();
     this.setupInteractionControls();
     if (this.input.mouse) this.input.mouse.disableContextMenu();
 
-    // Initial world draw
     if (this.grid) {
       this.renderStaticWorld();
     }
@@ -82,7 +72,6 @@ export class MainGameScene extends Phaser.Scene {
     this.itemGraphics = this.add.graphics().setDepth(20);
     this.ghostGraphics = this.add.graphics().setDepth(30);
 
-    // Particle manager for smoke & sparks
     this.smokeParticles = this.add.particles(0, 0, 'part_smoke', {
       lifespan: 1200,
       speed: { min: 10, max: 25 },
@@ -99,7 +88,6 @@ export class MainGameScene extends Phaser.Scene {
 
     const s = TILE_SIZE;
 
-    // Draw visible ground tiles
     for (let y = 0; y < WORLD_HEIGHT; y++) {
       for (let x = 0; x < WORLD_WIDTH; x++) {
         const px = x * s;
@@ -112,7 +100,6 @@ export class MainGameScene extends Phaser.Scene {
         const tile = this.grid.getTileAt(x, y);
         if (tile && tile.ore) {
           const oreTexKey = `ore_${tile.ore.replace('_ore', '')}`;
-          // Set depth 1 to ensure ores are strictly beneath buildings (depth 10)
           this.add.image(px + s / 2, py + s / 2, oreTexKey).setDepth(1);
         }
       }
@@ -120,21 +107,18 @@ export class MainGameScene extends Phaser.Scene {
   }
 
   setupCameraControls() {
-    // WASD & Arrow Key camera panning
     this.cursors = this.input.keyboard.createCursorKeys();
     this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
-    // Zoom with Scroll Wheel
     this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
       const zoom = this.cameras.main.zoom;
       const newZoom = Phaser.Math.Clamp(zoom - deltaY * 0.0015, 0.4, 2.5);
       this.cameras.main.setZoom(newZoom);
     });
 
-    // Mouse Canvas Drag Panning (Left Click Drag on empty canvas, or Middle/Right Click Drag anytime)
     this.isMousePanning = false;
     this.panStartPos = { x: 0, y: 0 };
 
@@ -160,14 +144,11 @@ export class MainGameScene extends Phaser.Scene {
   }
 
   setupInteractionControls() {
-    // Window-level global key handling for 100% reliable hotkey response
     window.addEventListener('keydown', (e) => {
-      // Don't capture keys if typing in input fields
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
       const key = e.key;
 
-      // 1-9 Number Keys for hotbar slots
       if (key >= '1' && key <= '9') {
         const slotIdx = parseInt(key, 10) - 1;
         if (this.uiManager) {
@@ -176,7 +157,6 @@ export class MainGameScene extends Phaser.Scene {
         return;
       }
 
-      // Categories (Z, X, C, V, B)
       const lowerKey = key.toLowerCase();
       if (lowerKey === 'z') { if (this.uiManager) this.uiManager.switchCategory('logistics'); }
       else if (lowerKey === 'x') { if (this.uiManager) this.uiManager.switchCategory('extraction'); }
@@ -190,11 +170,9 @@ export class MainGameScene extends Phaser.Scene {
           const b = this.grid.getBuildingAt(this.hoverTile.x, this.hoverTile.y);
           if (b) {
             if (e.shiftKey && b.type.startsWith('conveyor')) {
-              // Shift+E instantly bulk deletes connected line
               this.demolishConnectedLine(b);
               if (this.uiManager) this.uiManager.showToast('Conveyor line demolished.', 'warn');
             } else {
-              // Normal E deletes single building
               this.demolishAt(this.hoverTile.x, this.hoverTile.y);
             }
           }
@@ -206,15 +184,12 @@ export class MainGameScene extends Phaser.Scene {
         if (this.uiManager && this.uiManager.hasOpenConfirmModal()) {
           this.uiManager.cancelPendingAction();
         } else if (this.activeTool) {
-          // Cancel current placement or demolish mode
           this.setTool(null);
         } else {
-          // Toggle demolish mode when idle
           this.setTool('demolish');
         }
       }
       else if (lowerKey === 'r') {
-        // Only rotate if placing a directional building (not in demolish mode or idle)
         if (this.activeTool && this.activeTool !== 'demolish') {
           const bDef = BUILDINGS[this.activeTool];
           if (!bDef || bDef.directional !== false) {
@@ -245,7 +220,6 @@ export class MainGameScene extends Phaser.Scene {
       }
     });
 
-    // Pointer Input Handling (Placement / Inspection / Bulk Demolish)
     this.input.on('pointerdown', (pointer) => {
       if (this.activeTool === 'wire_tool' && pointer.rightButtonDown()) {
         const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
@@ -302,11 +276,9 @@ export class MainGameScene extends Phaser.Scene {
           const b = this.grid.getBuildingAt(gx, gy);
           if (b) {
             if (pointer.event.shiftKey && b.type.startsWith('conveyor')) {
-              // Shift + Click instantly bulk deletes the whole conveyor line
               this.demolishConnectedLine(b);
               if (this.uiManager) this.uiManager.showToast('Conveyor line demolished.', 'warn');
             } else {
-              // Click instantly deletes the single tile
               this.demolishAt(gx, gy);
             }
           }
@@ -330,16 +302,14 @@ export class MainGameScene extends Phaser.Scene {
       if (this.isDraggingBuild && pointer.leftButtonDown()) {
         if (gx !== this.lastDraggedTile.x || gy !== this.lastDraggedTile.y) {
           if (this.activeTool === 'demolish') {
-            // Bulk drag delete
             this.demolishAt(gx, gy);
           } else if (this.activeTool && this.activeTool.startsWith('conveyor')) {
-            // Auto-align conveyor direction towards drag direction
             const dx = gx - this.lastDraggedTile.x;
             const dy = gy - this.lastDraggedTile.y;
-            if (dx > 0) this.placementDirection = 1; // RIGHT
-            else if (dx < 0) this.placementDirection = 3; // LEFT
-            else if (dy > 0) this.placementDirection = 2; // DOWN
-            else if (dy < 0) this.placementDirection = 0; // UP
+            if (dx > 0) this.placementDirection = 1;
+            else if (dx < 0) this.placementDirection = 3;
+            else if (dy > 0) this.placementDirection = 2;
+            else if (dy < 0) this.placementDirection = 0;
 
             this.placeAt(gx, gy);
           }
@@ -349,7 +319,6 @@ export class MainGameScene extends Phaser.Scene {
     });
 
     this.input.on('pointerup', (pointer) => {
-      // Check for single click inspection when not dragging
       if (!this.activeTool && pointer.leftButtonReleased()) {
         const movedDist = Math.hypot(pointer.x - this.panStartPos.x, pointer.y - this.panStartPos.y);
         if (movedDist < 6) {
@@ -412,7 +381,6 @@ export class MainGameScene extends Phaser.Scene {
 
     while (queue.length > 0) {
       const cur = queue.shift();
-      // Check 4 adjacent neighbors
       const neighbors = [
         this.grid.getBuildingAt(cur.x, cur.y - 1),
         this.grid.getBuildingAt(cur.x + 1, cur.y),
@@ -489,7 +457,6 @@ export class MainGameScene extends Phaser.Scene {
     const wires = this.grid ? (this.grid.wires || []) : [];
     const s = TILE_SIZE;
 
-    // 1. Render all placed power cables with hanging catenary curve
     wires.forEach(w => {
       const p1x = w.x1 * s;
       const p1y = w.y1 * s;
@@ -501,31 +468,26 @@ export class MainGameScene extends Phaser.Scene {
       const midX = (p1x + p2x) / 2;
       const midY = (p1y + p2y) / 2 + sag;
 
-      // Check if energized
       const b1 = this.grid.getBuildingById(w.fromId);
       const b2 = this.grid.getBuildingById(w.toId);
       const isEnergized = (b1 && b1.powerSatisfied > 0.1) || (b2 && b2.powerSatisfied > 0.1);
 
       if (isEnergized) {
-        // High voltage electric amber glow
         this.powerLineGraphics.lineStyle(3.5, 0xf1c40f, 0.35);
         this.drawCatenaryCurve(p1x, p1y, midX, midY, p2x, p2y);
 
         this.powerLineGraphics.lineStyle(1.5, 0xfff099, 0.95);
         this.drawCatenaryCurve(p1x, p1y, midX, midY, p2x, p2y);
       } else {
-        // Dormant unpowered cable
         this.powerLineGraphics.lineStyle(1.5, 0x85929e, 0.65);
         this.drawCatenaryCurve(p1x, p1y, midX, midY, p2x, p2y);
       }
 
-      // Mounting terminal pins
       this.powerLineGraphics.fillStyle(0x1e293b, 1);
       this.powerLineGraphics.fillCircle(p1x, p1y, 3);
       this.powerLineGraphics.fillCircle(p2x, p2y, 3);
     });
 
-    // 2. Render live interactive cable preview when wire tool is selecting second component
     if (this.wireStartBuilding && this.activeTool === 'wire_tool') {
       const p1x = (this.wireStartBuilding.x + this.wireStartBuilding.width / 2) * s;
       const p1y = (this.wireStartBuilding.y + this.wireStartBuilding.height / 2) * s;
@@ -546,7 +508,6 @@ export class MainGameScene extends Phaser.Scene {
       this.powerLineGraphics.lineStyle(2, isValid ? 0xf1c40f : 0xe74c3c, 0.9);
       this.drawCatenaryCurve(p1x, p1y, midX, midY, p2x, p2y);
 
-      // Start pin highlight
       this.powerLineGraphics.fillStyle(isValid ? 0xf1c40f : 0xe74c3c, 1);
       this.powerLineGraphics.fillCircle(p1x, p1y, 4);
     }
@@ -570,32 +531,27 @@ export class MainGameScene extends Phaser.Scene {
   update(time, delta) {
     const deltaSec = (delta / 1000) * this.gameSpeed;
 
-    // Camera Panning
     const panSpeed = 600 / this.cameras.main.zoom;
     if (this.keyA.isDown || this.cursors.left.isDown) this.cameras.main.scrollX -= panSpeed * (delta / 1000);
     if (this.keyD.isDown || this.cursors.right.isDown) this.cameras.main.scrollX += panSpeed * (delta / 1000);
     if (this.keyW.isDown || this.cursors.up.isDown) this.cameras.main.scrollY -= panSpeed * (delta / 1000);
     if (this.keyS.isDown || this.cursors.down.isDown) this.cameras.main.scrollY += panSpeed * (delta / 1000);
 
-    // Animation frames for conveyor belts
     this.animTimer += deltaSec * 8;
     if (this.animTimer >= 1.0) {
       this.animTimer = 0;
       this.conveyorAnimFrame = (this.conveyorAnimFrame + 1) % 4;
     }
 
-    // Step Simulation
     if (this.powerGrid) this.powerGrid.update(deltaSec);
     if (this.logistics) this.logistics.update(deltaSec);
     if (this.factory) this.factory.update(deltaSec);
 
-    // Render Dynamic Elements
     this.renderBuildings();
     this.renderPowerLines();
     this.renderItems();
     this.renderGhostPreview();
 
-    // UI Updates
     if (this.uiManager) {
       this.uiManager.updateHUD(this.hoverTile);
     }
@@ -612,25 +568,22 @@ export class MainGameScene extends Phaser.Scene {
       const pw = b.width * s;
       const ph = b.height * s;
 
-      // Handle Conveyor animations & auto-corner turns
       if (b.type === 'conveyor_mk1' || b.type === 'conveyor_mk2') {
         const outDir = b.direction;
         const oppDir = (outDir + 2) % 4;
 
-        // Detect neighbor inputs
         const upB = this.grid.getBuildingAt(b.x, b.y - 1);
         const rightB = this.grid.getBuildingAt(b.x + 1, b.y);
         const downB = this.grid.getBuildingAt(b.x, b.y + 1);
         const leftB = this.grid.getBuildingAt(b.x - 1, b.y);
 
         const feedsFrom = [
-          upB && (upB.direction === 2 || (upB.def && upB.def.width > 1 && upB.direction === 2)),      // from UP (0)
-          rightB && (rightB.direction === 3 || (rightB.def && rightB.def.width > 1 && rightB.direction === 3)), // from RIGHT (1)
-          downB && (downB.direction === 0 || (downB.def && downB.def.width > 1 && downB.direction === 0)),  // from DOWN (2)
-          leftB && (leftB.direction === 1 || (leftB.def && leftB.def.width > 1 && leftB.direction === 1))   // from LEFT (3)
+          upB && (upB.direction === 2 || (upB.def && upB.def.width > 1 && upB.direction === 2)),
+          rightB && (rightB.direction === 3 || (rightB.def && rightB.def.width > 1 && rightB.direction === 3)),
+          downB && (downB.direction === 0 || (downB.def && downB.def.width > 1 && downB.direction === 0)),
+          leftB && (leftB.direction === 1 || (leftB.def && leftB.def.width > 1 && leftB.direction === 1))
         ];
 
-        // Check if this belt is a corner turn
         const isCorner = !feedsFrom[oppDir] && (feedsFrom[(outDir + 1) % 4] || feedsFrom[(outDir + 3) % 4]);
         const cornerInDir = feedsFrom[(outDir + 1) % 4] ? ((outDir + 1) % 4) : (feedsFrom[(outDir + 3) % 4] ? ((outDir + 3) % 4) : null);
 
@@ -642,14 +595,12 @@ export class MainGameScene extends Phaser.Scene {
         this.buildingGraphics.translateCanvas(px + s / 2, py + s / 2);
         this.buildingGraphics.rotateCanvas(Phaser.Math.DegToRad(angle));
 
-        // Conveyor Base Backing
         this.buildingGraphics.fillStyle(0x1e293b, 1);
         this.buildingGraphics.fillRect(-s / 2, -s / 2, s, s);
 
         const trackColor = isMk2 ? 0x09131f : 0x0f172a;
         const railColor = isMk2 ? 0x00f0ff : 0x475569;
 
-        // Corner belts retain the same full-width track and rollers as straight belts.
         this.buildingGraphics.fillStyle(trackColor, 1);
         this.buildingGraphics.fillRect(-s / 2 + 5, -s / 2, s - 10, s);
         this.buildingGraphics.fillStyle(railColor, 1);
@@ -660,7 +611,6 @@ export class MainGameScene extends Phaser.Scene {
           const relInDir = (cornerInDir - outDir + 4) % 4;
           const openingHeight = 28;
 
-          // The unused rear edge is closed; only the actual entering side has an opening.
           this.buildingGraphics.fillRect(-s / 2, s / 2 - 5, s, 5);
           this.buildingGraphics.fillStyle(trackColor, 1);
           if (relInDir === 1) {
@@ -679,7 +629,6 @@ export class MainGameScene extends Phaser.Scene {
           }
         }
 
-        // Direction Arrow in center
         this.buildingGraphics.fillStyle(accentColor, 0.95);
         this.buildingGraphics.fillTriangle(0, -s / 2 + 6, -7, -s / 2 + 20, 7, -s / 2 + 20);
 
@@ -687,7 +636,6 @@ export class MainGameScene extends Phaser.Scene {
         return;
       }
 
-      // Draw non-conveyor buildings (Drills, Smelters, Assemblers, Power)
       let fillColor = 0x334155;
       let strokeColor = 0x64748b;
 
@@ -714,15 +662,12 @@ export class MainGameScene extends Phaser.Scene {
         strokeColor = 0x00f0ff;
       }
 
-      // Main Building Body (Solid opaque background on Depth 10)
       this.buildingGraphics.fillStyle(fillColor, 1);
       this.buildingGraphics.fillRect(px + 3, py + 3, pw - 6, ph - 6);
       this.buildingGraphics.lineStyle(2, strokeColor, 1);
       this.buildingGraphics.strokeRect(px + 3, py + 3, pw - 6, ph - 6);
 
-      // Render Machine Detail Centers
       if (b.type.includes('drill')) {
-        // Prominent Rotating Cutter Head Center
         this.buildingGraphics.fillStyle(0x0f172a, 1);
         this.buildingGraphics.fillCircle(px + pw / 2, py + ph / 2, pw * 0.3);
         this.buildingGraphics.fillStyle(strokeColor, 0.9);
@@ -730,7 +675,6 @@ export class MainGameScene extends Phaser.Scene {
         this.buildingGraphics.fillStyle(0xffffff, 0.9);
         this.buildingGraphics.fillCircle(px + pw / 2, py + ph / 2, pw * 0.1);
       } else if (b.type.includes('smelter')) {
-        // Glowing molten core
         this.buildingGraphics.fillStyle(0x7c2d12, 1);
         this.buildingGraphics.fillCircle(px + pw / 2, py + ph / 2, pw * 0.32);
         this.buildingGraphics.fillStyle(0xf97316, 0.95);
@@ -738,41 +682,38 @@ export class MainGameScene extends Phaser.Scene {
         this.buildingGraphics.fillStyle(0xffffff, 0.9);
         this.buildingGraphics.fillCircle(px + pw / 2, py + ph / 2, pw * 0.1);
       } else if (b.type.includes('assembler')) {
-        // Robotic arm cross
         this.buildingGraphics.lineStyle(4, strokeColor, 1);
         this.buildingGraphics.lineBetween(px + pw * 0.25, py + ph / 2, px + pw * 0.75, py + ph / 2);
         this.buildingGraphics.lineBetween(px + pw / 2, py + ph * 0.25, px + pw / 2, py + ph * 0.75);
       } else if (b.type === 'launchpad') {
-        // Launchpad concentric rings
         this.buildingGraphics.lineStyle(3, 0x00f0ff, 1);
         this.buildingGraphics.strokeCircle(px + pw / 2, py + ph / 2, pw * 0.32);
         this.buildingGraphics.strokeCircle(px + pw / 2, py + ph / 2, pw * 0.16);
       }
 
-      // Output Facing Edge: Draw bright output port arrows across entire facing edge!
       if (b.def.directional) {
         const dir = b.direction;
         this.buildingGraphics.fillStyle(0xffffff, 0.95);
 
-        if (dir === 0) { // UP
+        if (dir === 0) {
           for (let dx = 0; dx < b.width; dx++) {
             const arrowX = px + (dx + 0.5) * s;
             const arrowY = py + 8;
             this.buildingGraphics.fillTriangle(arrowX, arrowY - 4, arrowX - 5, arrowY + 5, arrowX + 5, arrowY + 5);
           }
-        } else if (dir === 1) { // RIGHT
+        } else if (dir === 1) {
           for (let dy = 0; dy < b.height; dy++) {
             const arrowX = px + pw - 8;
             const arrowY = py + (dy + 0.5) * s;
             this.buildingGraphics.fillTriangle(arrowX + 4, arrowY, arrowX - 5, arrowY - 5, arrowX - 5, arrowY + 5);
           }
-        } else if (dir === 2) { // DOWN
+        } else if (dir === 2) {
           for (let dx = 0; dx < b.width; dx++) {
             const arrowX = px + (dx + 0.5) * s;
             const arrowY = py + ph - 8;
             this.buildingGraphics.fillTriangle(arrowX, arrowY + 4, arrowX - 5, arrowY - 5, arrowX + 5, arrowY - 5);
           }
-        } else if (dir === 3) { // LEFT
+        } else if (dir === 3) {
           for (let dy = 0; dy < b.height; dy++) {
             const arrowX = px + 8;
             const arrowY = py + (dy + 0.5) * s;
@@ -781,7 +722,6 @@ export class MainGameScene extends Phaser.Scene {
         }
       }
 
-      // Selected machine highlight outline
       if (this.selectedBuilding === b) {
         this.buildingGraphics.lineStyle(2, 0x00f0ff, 1);
         this.buildingGraphics.strokeRect(px - 2, py - 2, pw + 4, ph + 4);
@@ -794,7 +734,6 @@ export class MainGameScene extends Phaser.Scene {
     const items = this.logistics ? this.logistics.itemsInTransit : [];
 
     items.forEach(it => {
-      // Draw crisp item circle with color indicator
       let itemColor = 0xffffff;
       if (it.item === 'iron_ore') itemColor = 0x9ba3af;
       else if (it.item === 'copper_ore') itemColor = 0xd97706;
@@ -854,7 +793,6 @@ export class MainGameScene extends Phaser.Scene {
     this.ghostGraphics.lineStyle(2, tintColor, 0.9);
     this.ghostGraphics.strokeRect(px, py, pw, ph);
 
-    // Direction arrow on ghost
     if (bDef.directional) {
       const dirVec = DIR_VECTORS[this.placementDirection];
       const arrowX = px + pw / 2 + dirVec.dx * (pw / 2 - 10);

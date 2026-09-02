@@ -13,14 +13,12 @@ export class PowerGrid {
     const buildings = this.grid.buildings;
     const wires = this.grid.wires || [];
 
-    // Reset all consumers to 0 satisfaction initially
     buildings.forEach(b => {
       if (b.def.powerDemand > 0) {
         b.powerSatisfied = 0.0;
       }
     });
 
-    // 1. Build building adjacency graph from user-connected wires
     const adj = new Map();
     buildings.forEach(b => adj.set(b.id, []));
 
@@ -35,7 +33,6 @@ export class PowerGrid {
       }
     });
 
-    // 2. Partition connected components (sub-grids)
     const visited = new Set();
     this.networks = [];
 
@@ -58,7 +55,6 @@ export class PowerGrid {
           });
         }
 
-        // Only register network if it has at least 1 generator or power pole or consumer
         const generators = netBuildings.filter(b => (b.def.powerOutput || 0) > 0);
         const consumers = netBuildings.filter(b => (b.def.powerDemand || 0) > 0);
         const accumulators = netBuildings.filter(b => b.type === 'accumulator');
@@ -81,7 +77,6 @@ export class PowerGrid {
       }
     });
 
-    // 3. Solve power satisfaction for each wired network
     let globalSupply = 0;
     let globalDemand = 0;
 
@@ -89,21 +84,18 @@ export class PowerGrid {
       let netSupply = 0;
       let netDemand = 0;
 
-      // Calculate total demand from connected active machines
       net.consumers.forEach(con => {
         if (con.active) {
           netDemand += (con.def.powerDemand || 0);
         }
       });
 
-      // Calculate generator output
       net.generators.forEach(gen => {
         if (gen.type === 'coal_generator') {
           const coalCount = gen.inputs['coal'] || 0;
           if (coalCount > 0) {
             netSupply += (gen.def.powerOutput || 150);
             
-            // Only burn coal when grid has active electrical demand
             if (netDemand > 0) {
               if (gen.burnProgress === undefined) gen.burnProgress = 0.0;
               gen.burnProgress += (gen.def.fuelPerSec || 0.15) * deltaSec;
@@ -115,12 +107,10 @@ export class PowerGrid {
             }
           }
         } else {
-          // Solar panel
           netSupply += (gen.def.powerOutput || 80);
         }
       });
 
-      // Accumulator charge / discharge logic
       let netStored = 0;
       let netCapacity = 0;
       net.accumulators.forEach(acc => {
@@ -133,7 +123,6 @@ export class PowerGrid {
       if (netDemand > 0) {
         if (netSupply >= netDemand) {
           satisfaction = 1.0;
-          // Charge accumulators with surplus
           const surplus = (netSupply - netDemand) * deltaSec;
           if (netCapacity > 0 && netStored < netCapacity) {
             const chargeEach = surplus / net.accumulators.length;
@@ -142,7 +131,6 @@ export class PowerGrid {
             });
           }
         } else {
-          // Deficit: Try discharging accumulators
           const deficit = netDemand - netSupply;
           let dischargeAvailable = 0;
           net.accumulators.forEach(acc => {

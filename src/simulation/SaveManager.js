@@ -57,13 +57,11 @@ export class SaveManager {
   }
 
   static applySaveData(data, grid, milestoneManager) {
-    // Clear existing buildings and wires
     while (grid.buildings.length > 0) {
       grid.removeBuilding(grid.buildings[0]);
     }
     grid.wires = [];
 
-    // Restore Milestones
     if (data.milestones) {
       milestoneManager.currentMilestoneIndex = data.milestones.currentIndex || 1;
       milestoneManager.researchPoints = data.milestones.researchPoints || 0;
@@ -73,7 +71,6 @@ export class SaveManager {
       milestoneManager.unlockedItems = new Set(data.milestones.unlockedItems || []);
     }
 
-    // Restore Buildings
     const idMap = new Map();
     if (data.buildings) {
       data.buildings.forEach(bData => {
@@ -89,7 +86,6 @@ export class SaveManager {
       });
     }
 
-    // Restore Wires
     if (data.wires && Array.isArray(data.wires)) {
       data.wires.forEach(w => {
         const b1 = grid.buildings.find(b => b.x + b.width / 2 === w.x1 && b.y + b.height / 2 === w.y1) || grid.getBuildingById(w.fromId);

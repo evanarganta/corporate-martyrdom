@@ -10,17 +10,15 @@ export const DIRECTIONS = {
 };
 
 export const DIR_VECTORS = [
-  { dx: 0, dy: -1 }, // UP
-  { dx: 1, dy: 0 },  // RIGHT
-  { dx: 0, dy: 1 },  // DOWN
-  { dx: -1, dy: 0 }  // LEFT
+  { dx: 0, dy: -1 },
+  { dx: 1, dy: 0 },
+  { dx: 0, dy: 1 },
+  { dx: -1, dy: 0 }
 ];
 
 export const DIR_ANGLES = [0, 90, 180, 270];
 
-// High-fidelity handcrafted SVG icons for all items and buildings (Real industrial game art)
 export const SVG_ICONS = {
-  // Ores
   iron_ore: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <polygon points="12,18 24,8 36,14 42,28 32,40 16,42 6,30" fill="#475569" stroke="#1e293b" stroke-width="2"/>
     <polygon points="12,18 24,8 28,24 16,28" fill="#64748b"/>
@@ -38,7 +36,6 @@ export const SVG_ICONS = {
     <polygon points="40,16 38,34 26,44 32,26" fill="#92400e"/>
     <polygon points="16,24 26,22 32,26 26,44 10,38" fill="#78350f"/>
     <polygon points="6,24 14,14 16,24 10,38" fill="#451a03"/>
-    <!-- Malachite green vein accents -->
     <path d="M 18,18 Q 24,20 22,28" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
     <line x1="26" y1="10" x2="32" y2="14" stroke="#fde68a" stroke-width="1.5" stroke-linecap="round"/>
   </svg>`,
@@ -54,7 +51,6 @@ export const SVG_ICONS = {
   </svg>`,
 
   quartz: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Crystalline needles -->
     <polygon points="24,4 32,20 28,42 20,42 16,20" fill="#0284c7" stroke="#0c4a6e" stroke-width="1.5"/>
     <polygon points="24,4 20,20 20,42 24,42" fill="#38bdf8"/>
     <polygon points="24,4 28,20 28,42 24,42" fill="#bae6fd"/>
@@ -73,7 +69,6 @@ export const SVG_ICONS = {
     <line x1="24" y1="9" x2="32" y2="13" stroke="#e0e7ff" stroke-width="1.5" stroke-linecap="round"/>
   </svg>`,
 
-  // Ingots & Smelted
   iron_ingot: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <polygon points="12,14 36,14 42,28 6,28" fill="#94a3b8" stroke="#334155" stroke-width="2"/>
     <polygon points="6,28 42,28 38,38 10,38" fill="#64748b" stroke="#334155" stroke-width="2"/>
@@ -91,7 +86,6 @@ export const SVG_ICONS = {
   silicon_wafer: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="24" cy="24" r="18" fill="#0f172a" stroke="#0284c7" stroke-width="2"/>
     <circle cx="24" cy="24" r="15" fill="#1e293b"/>
-    <!-- Wafer iridescent grid -->
     <line x1="12" y1="18" x2="36" y2="18" stroke="#38bdf8" stroke-width="1" stroke-dasharray="2 2"/>
     <line x1="10" y1="24" x2="38" y2="24" stroke="#38bdf8" stroke-width="1" stroke-dasharray="2 2"/>
     <line x1="12" y1="30" x2="36" y2="30" stroke="#38bdf8" stroke-width="1" stroke-dasharray="2 2"/>
@@ -107,11 +101,9 @@ export const SVG_ICONS = {
     <line x1="14" y1="18" x2="34" y2="18" stroke="#e0e7ff" stroke-width="1.5" stroke-linecap="round"/>
   </svg>`,
 
-  // Manufactured Components
   iron_plate: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="10" width="32" height="28" rx="2" fill="#475569" stroke="#1e293b" stroke-width="2"/>
     <rect x="11" y="13" width="26" height="22" fill="#64748b"/>
-    <!-- Rivets -->
     <circle cx="12" cy="14" r="1.5" fill="#cbd5e1"/>
     <circle cx="36" cy="14" r="1.5" fill="#cbd5e1"/>
     <circle cx="12" cy="34" r="1.5" fill="#cbd5e1"/>
@@ -133,9 +125,7 @@ export const SVG_ICONS = {
 
   circuit_board: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="8" width="32" height="32" rx="3" fill="#064e3b" stroke="#022c22" stroke-width="2"/>
-    <!-- Microchip in center -->
     <rect x="18" y="18" width="12" height="12" rx="1" fill="#0f172a" stroke="#334155" stroke-width="1"/>
-    <!-- PCB copper traces -->
     <path d="M 12,12 L 18,12 L 18,18" stroke="#10b981" stroke-width="1.5" fill="none"/>
     <path d="M 36,12 L 30,12 L 30,18" stroke="#10b981" stroke-width="1.5" fill="none"/>
     <path d="M 12,36 L 18,36 L 18,30" stroke="#10b981" stroke-width="1.5" fill="none"/>
@@ -149,7 +139,6 @@ export const SVG_ICONS = {
   microchip: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="12" y="12" width="24" height="24" rx="2" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
     <rect x="16" y="16" width="16" height="16" fill="#1e293b"/>
-    <!-- Pins -->
     <line x1="8" y1="16" x2="12" y2="16" stroke="#94a3b8" stroke-width="2"/>
     <line x1="8" y1="24" x2="12" y2="24" stroke="#94a3b8" stroke-width="2"/>
     <line x1="8" y1="32" x2="12" y2="32" stroke="#94a3b8" stroke-width="2"/>
@@ -161,19 +150,16 @@ export const SVG_ICONS = {
 
   motor: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="14" width="26" height="20" rx="3" fill="#334155" stroke="#0f172a" stroke-width="2"/>
-    <!-- Copper rotor windings -->
     <rect x="12" y="17" width="18" height="14" rx="2" fill="#d97706" stroke="#92400e" stroke-width="1.5"/>
     <line x1="17" y1="17" x2="17" y2="31" stroke="#fde68a" stroke-width="1"/>
     <line x1="22" y1="17" x2="22" y2="31" stroke="#fde68a" stroke-width="1"/>
     <line x1="27" y1="17" x2="27" y2="31" stroke="#fde68a" stroke-width="1"/>
-    <!-- Drive shaft -->
     <rect x="34" y="21" width="8" height="6" fill="#cbd5e1" stroke="#475569" stroke-width="1"/>
   </svg>`,
 
   reinforced_plate: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="6" y="8" width="36" height="32" rx="2" fill="#334155" stroke="#1e293b" stroke-width="2"/>
     <polygon points="10,12 38,12 38,36 10,36" fill="#475569"/>
-    <!-- Structural X-brace -->
     <line x1="10" y1="12" x2="38" y2="36" stroke="#94a3b8" stroke-width="3"/>
     <line x1="38" y1="12" x2="10" y2="36" stroke="#94a3b8" stroke-width="3"/>
     <circle cx="24" cy="24" r="3" fill="#cbd5e1" stroke="#334155" stroke-width="1"/>
@@ -181,10 +167,8 @@ export const SVG_ICONS = {
 
   energy_cell: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="14" y="10" width="20" height="30" rx="3" fill="#1e1b4b" stroke="#4338ca" stroke-width="2"/>
-    <!-- Glowing core -->
     <rect x="18" y="16" width="12" height="18" rx="2" fill="#ec4899" stroke="#f472b6" stroke-width="1.5"/>
     <polygon points="24,18 20,25 24,25 22,32 28,24 24,24" fill="#fdf2f8"/>
-    <!-- Terminals -->
     <rect x="20" y="6" width="8" height="4" rx="1" fill="#e0e7ff"/>
   </svg>`,
 
@@ -194,29 +178,24 @@ export const SVG_ICONS = {
     <circle cx="24" cy="24" r="6" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2"/>
   </svg>`,
 
-  // Buildings & Machinery
   conveyor_mk1: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="6" y="8" width="36" height="32" rx="2" fill="#1e293b" stroke="#334155" stroke-width="2"/>
     <rect x="10" y="12" width="28" height="24" fill="#0f172a"/>
-    <!-- Rollers -->
     <line x1="12" y1="16" x2="36" y2="16" stroke="#475569" stroke-width="2"/>
     <line x1="12" y1="24" x2="36" y2="24" stroke="#475569" stroke-width="2"/>
     <line x1="12" y1="32" x2="36" y2="32" stroke="#475569" stroke-width="2"/>
-    <!-- Arrow -->
     <polygon points="24,14 18,24 30,24" fill="#f1c40f"/>
   </svg>`,
 
   conveyor_mk2: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="6" y="8" width="36" height="32" rx="2" fill="#1e293b" stroke="#f39c12" stroke-width="2"/>
     <rect x="10" y="12" width="28" height="24" fill="#090d16"/>
-    <!-- Express Chevrons -->
     <polygon points="24,12 16,22 32,22" fill="#f39c12"/>
     <polygon points="24,24 16,34 32,34" fill="#f39c12"/>
   </svg>`,
 
   splitter: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="8" width="32" height="32" rx="3" fill="#1e293b" stroke="#475569" stroke-width="2"/>
-    <!-- 1 input bottom, 2 outputs top/sides -->
     <polygon points="24,28 20,38 28,38" fill="#f1c40f"/>
     <polygon points="12,18 20,12 20,24" fill="#f1c40f"/>
     <polygon points="36,18 28,12 28,24" fill="#f1c40f"/>
@@ -225,7 +204,6 @@ export const SVG_ICONS = {
 
   merger: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="8" width="32" height="32" rx="3" fill="#1e293b" stroke="#475569" stroke-width="2"/>
-    <!-- 2 inputs sides, 1 output top -->
     <polygon points="24,10 18,20 30,20" fill="#2ecc71"/>
     <polygon points="18,30 10,24 10,36" fill="#f1c40f"/>
     <polygon points="30,30 38,24 38,36" fill="#f1c40f"/>
@@ -240,7 +218,6 @@ export const SVG_ICONS = {
   burner_drill: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="8" width="32" height="32" rx="3" fill="#334155" stroke="#1e293b" stroke-width="2"/>
     <circle cx="24" cy="24" r="11" fill="#1e293b" stroke="#d97706" stroke-width="2"/>
-    <!-- Rotary cutter head -->
     <line x1="16" y1="16" x2="32" y2="32" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
     <line x1="32" y1="16" x2="16" y2="32" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
     <circle cx="24" cy="24" r="3" fill="#f59e0b"/>
@@ -256,14 +233,12 @@ export const SVG_ICONS = {
   deep_drill: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <polygon points="24,6 42,16 42,38 24,44 6,38 6,16" fill="#1e1b4b" stroke="#6366f1" stroke-width="2"/>
     <circle cx="24" cy="26" r="10" fill="#312e81" stroke="#818cf8" stroke-width="2"/>
-    <!-- Heavy Drill Diamond -->
     <polygon points="24,18 30,26 24,34 18,26" fill="#c7d2fe"/>
   </svg>`,
 
   smelter_mk1: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="8" width="32" height="32" rx="3" fill="#292524" stroke="#44403c" stroke-width="2"/>
     <polygon points="16,34 32,34 28,18 20,18" fill="#78350f" stroke="#b45309" stroke-width="1.5"/>
-    <!-- Lava Crucible glow -->
     <ellipse cx="24" cy="26" rx="6" ry="4" fill="#f59e0b"/>
     <ellipse cx="24" cy="26" rx="3" ry="2" fill="#fef08a"/>
   </svg>`,
@@ -277,7 +252,6 @@ export const SVG_ICONS = {
 
   assembler_mk1: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="8" width="32" height="32" rx="3" fill="#1e293b" stroke="#475569" stroke-width="2"/>
-    <!-- Mechanical robotic arm -->
     <circle cx="16" cy="32" r="4" fill="#64748b"/>
     <line x1="16" y1="32" x2="26" y2="20" stroke="#cbd5e1" stroke-width="3"/>
     <circle cx="26" cy="20" r="3" fill="#94a3b8"/>
@@ -294,11 +268,9 @@ export const SVG_ICONS = {
   </svg>`,
 
   power_pole: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Transmission pylon -->
     <line x1="24" y1="6" x2="24" y2="42" stroke="#64748b" stroke-width="3"/>
     <line x1="12" y1="16" x2="36" y2="16" stroke="#94a3b8" stroke-width="2.5"/>
     <line x1="14" y1="26" x2="34" y2="26" stroke="#94a3b8" stroke-width="2.5"/>
-    <!-- Insulators -->
     <circle cx="12" cy="16" r="2" fill="#f1c40f"/>
     <circle cx="36" cy="16" r="2" fill="#f1c40f"/>
     <circle cx="14" cy="26" r="2" fill="#f1c40f"/>
@@ -307,17 +279,14 @@ export const SVG_ICONS = {
 
   coal_generator: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="16" width="32" height="24" rx="2" fill="#27272a" stroke="#52525b" stroke-width="2"/>
-    <!-- Smokestacks -->
     <rect x="12" y="6" width="6" height="12" fill="#52525b"/>
     <rect x="22" y="8" width="6" height="10" fill="#52525b"/>
-    <!-- Combustion fire port -->
     <ellipse cx="28" cy="28" rx="6" ry="4" fill="#ea580c"/>
     <ellipse cx="28" cy="28" rx="3" ry="2" fill="#fde047"/>
   </svg>`,
 
   solar_panel: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <polygon points="6,14 42,14 38,38 10,38" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2"/>
-    <!-- Photovoltaic cells grid -->
     <line x1="18" y1="14" x2="19" y2="38" stroke="#93c5fd" stroke-width="1.5"/>
     <line x1="30" y1="14" x2="29" y2="38" stroke="#93c5fd" stroke-width="1.5"/>
     <line x1="8" y1="26" x2="40" y2="26" stroke="#93c5fd" stroke-width="1.5"/>
@@ -326,11 +295,9 @@ export const SVG_ICONS = {
   accumulator: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="10" y="12" width="28" height="28" rx="3" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
     <rect x="14" y="16" width="20" height="20" rx="2" fill="#0f172a"/>
-    <!-- Battery Level Indicator Bars -->
     <rect x="17" y="29" width="14" height="4" fill="#3b82f6"/>
     <rect x="17" y="23" width="14" height="4" fill="#60a5fa"/>
     <rect x="17" y="17" width="14" height="4" fill="#93c5fd"/>
-    <!-- Terminals -->
     <rect x="16" y="8" width="4" height="4" fill="#ef4444"/>
     <rect x="28" y="8" width="4" height="4" fill="#3b82f6"/>
   </svg>`,
@@ -338,7 +305,6 @@ export const SVG_ICONS = {
   storage_chest: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="8" y="12" width="32" height="28" rx="3" fill="#334155" stroke="#1e293b" stroke-width="2"/>
     <rect x="12" y="8" width="24" height="6" rx="2" fill="#475569" stroke="#1e293b" stroke-width="1.5"/>
-    <!-- Heavy Cargo lock latch -->
     <rect x="21" y="20" width="6" height="8" rx="1" fill="#f59e0b" stroke="#78350f" stroke-width="1"/>
     <line x1="10" y1="24" x2="38" y2="24" stroke="#1e293b" stroke-width="1.5"/>
   </svg>`,
@@ -346,7 +312,6 @@ export const SVG_ICONS = {
   launchpad: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <polygon points="8,40 40,40 36,24 12,24" fill="#334155" stroke="#1e293b" stroke-width="2"/>
     <rect x="16" y="12" width="16" height="20" rx="2" fill="#64748b" stroke="#334155" stroke-width="1.5"/>
-    <!-- Launch Gantry / Rocket silhouette -->
     <polygon points="24,6 20,16 28,16" fill="#f43f5e"/>
     <rect x="22" y="16" width="4" height="12" fill="#f1f5f9"/>
     <polygon points="18,24 22,24 22,28 18,28" fill="#3b82f6"/>
@@ -355,20 +320,17 @@ export const SVG_ICONS = {
 };
 
 export const ITEMS = {
-  // Raw Ores
   iron_ore: { id: 'iron_ore', name: 'Iron Ore', category: 'ore', color: '#8a9ba8', symbol: 'Fe', iconSvg: SVG_ICONS.iron_ore },
   copper_ore: { id: 'copper_ore', name: 'Copper Ore', category: 'ore', color: '#d97706', symbol: 'Cu', iconSvg: SVG_ICONS.copper_ore },
   coal: { id: 'coal', name: 'Coal', category: 'fuel', color: '#1e293b', symbol: 'C', iconSvg: SVG_ICONS.coal },
   quartz: { id: 'quartz', name: 'Quartz', category: 'ore', color: '#38bdf8', symbol: 'Si', iconSvg: SVG_ICONS.quartz },
   titanium_ore: { id: 'titanium_ore', name: 'Titanium Ore', category: 'ore', color: '#818cf8', symbol: 'Ti', iconSvg: SVG_ICONS.titanium_ore },
 
-  // Smelted Products
   iron_ingot: { id: 'iron_ingot', name: 'Iron Ingot', category: 'smelted', color: '#cbd5e1', symbol: 'Fe-Bar', iconSvg: SVG_ICONS.iron_ingot },
   copper_ingot: { id: 'copper_ingot', name: 'Copper Ingot', category: 'smelted', color: '#f59e0b', symbol: 'Cu-Bar', iconSvg: SVG_ICONS.copper_ingot },
   silicon_wafer: { id: 'silicon_wafer', name: 'Silicon Wafer', category: 'smelted', color: '#00f0ff', symbol: 'Si-Waf', iconSvg: SVG_ICONS.silicon_wafer },
   titanium_bar: { id: 'titanium_bar', name: 'Titanium Ingot', category: 'smelted', color: '#a5b4fc', symbol: 'Ti-Bar', iconSvg: SVG_ICONS.titanium_bar },
 
-  // Manufactured Components
   iron_plate: { id: 'iron_plate', name: 'Iron Plate', category: 'component', color: '#94a3b8', symbol: 'Plate', iconSvg: SVG_ICONS.iron_plate },
   gear: { id: 'gear', name: 'Gear', category: 'component', color: '#64748b', symbol: 'Gear', iconSvg: SVG_ICONS.gear },
   copper_wire: { id: 'copper_wire', name: 'Copper Wire', category: 'component', color: '#fbbf24', symbol: 'Wire', iconSvg: SVG_ICONS.copper_wire },
@@ -381,7 +343,6 @@ export const ITEMS = {
 };
 
 export const BUILDINGS = {
-  // Logistics
   conveyor_mk1: {
     id: 'conveyor_mk1',
     name: 'Conveyor',
@@ -444,7 +405,6 @@ export const BUILDINGS = {
     cost: [{ item: 'iron_plate', count: 6 }, { item: 'gear', count: 4 }]
   },
 
-  // Extraction
   burner_drill: {
     id: 'burner_drill',
     name: 'Mechanical Drill',
@@ -482,7 +442,6 @@ export const BUILDINGS = {
     cost: [{ item: 'reinforced_plate', count: 10 }, { item: 'motor', count: 6 }, { item: 'microchip', count: 4 }]
   },
 
-  // Processing
   smelter_mk1: {
     id: 'smelter_mk1',
     name: 'Smelter',
@@ -532,7 +491,6 @@ export const BUILDINGS = {
     cost: [{ item: 'reinforced_plate', count: 16 }, { item: 'microchip', count: 10 }, { item: 'motor', count: 8 }]
   },
 
-  // Power
   wire_tool: {
     id: 'wire_tool',
     name: 'Power Cable',
@@ -598,7 +556,6 @@ export const BUILDINGS = {
     cost: [{ item: 'iron_plate', count: 8 }, { item: 'copper_wire', count: 12 }, { item: 'circuit_board', count: 4 }]
   },
 
-  // Storage & Hub
   storage_chest: {
     id: 'storage_chest',
     name: 'Storage Silo',
@@ -625,7 +582,6 @@ export const BUILDINGS = {
 };
 
 export const RECIPES = [
-  // Smelting
   {
     id: 'smelt_iron',
     name: 'Iron Ingot',
@@ -667,7 +623,6 @@ export const RECIPES = [
     outputs: [{ item: 'titanium_bar', count: 1 }]
   },
 
-  // Assembly
   {
     id: 'craft_iron_plate',
     name: 'Iron Plate',

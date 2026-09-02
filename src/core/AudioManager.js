@@ -1,4 +1,3 @@
-// Procedural Web Audio Sound Synthesizer for Factory Simulation
 
 class AudioManager {
   constructor() {
@@ -152,7 +151,7 @@ class AudioManager {
     this.init();
     if (!this.ctx) return;
 
-    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 arpeggio
+    const notes = [523.25, 659.25, 783.99, 1046.50];
     notes.forEach((freq, i) => {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();

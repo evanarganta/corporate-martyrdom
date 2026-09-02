@@ -43,7 +43,6 @@ body {
   height: 100vh;
 }
 
-/* Canvas Container */
 #game-container {
   width: 100vw;
   height: 100vh;
@@ -62,7 +61,6 @@ body {
   image-rendering: crisp-edges;
 }
 
-/* UI Overlay Layer */
 #ui-overlay {
   position: absolute;
   top: 0;
@@ -73,7 +71,6 @@ body {
   pointer-events: none;
 }
 
-/* Enable pointer events on interactive UI elements */
 .glass-panel,
 .glass-panel *,
 .btn-action,
@@ -104,7 +101,6 @@ table {
   pointer-events: auto;
 }
 
-/* Industrial Matte Panel */
 .glass-panel {
   background: var(--bg-panel);
   border: 1px solid var(--border-dim);
@@ -112,7 +108,6 @@ table {
   border-radius: 4px;
 }
 
-/* Top Bar */
 .hud-header {
   position: absolute;
   top: 10px;
@@ -191,7 +186,6 @@ table {
   gap: 6px;
 }
 
-/* Speed Controls */
 .speed-controls {
   display: flex;
   background: var(--bg-slot);
@@ -229,7 +223,6 @@ table {
   font-weight: 800;
 }
 
-/* Action Buttons */
 .btn-action {
   background: var(--bg-card);
   border: 1px solid var(--border-dim);
@@ -303,7 +296,6 @@ table {
   margin-bottom: 8px;
 }
 
-/* Floating Milestone Card (Top Right) */
 .floating-card {
   position: absolute;
   top: 62px;
@@ -400,7 +392,6 @@ table {
   color: var(--text-dim);
 }
 
-/* Placement Banner (Centered above Hotbar) */
 .placement-banner {
   position: absolute;
   bottom: 120px;
@@ -429,7 +420,6 @@ table {
   color: var(--text-dim);
 }
 
-/* Bottom Hotbar HUD */
 #bottom-hud {
   position: absolute;
   bottom: 12px;
@@ -593,7 +583,6 @@ table {
   max-width: 95px;
 }
 
-/* Machine Inspector Panel */
 .modal-panel {
   position: absolute;
   top: 62px;
@@ -814,7 +803,6 @@ table {
   min-width: 90px;
 }
 
-/* Modals */
 .modal-backdrop {
   position: absolute;
   top: 0;
@@ -886,7 +874,6 @@ table {
   overflow-y: auto;
 }
 
-/* Tech Tree */
 .tier-tabs {
   display: flex;
   gap: 6px;
@@ -999,7 +986,6 @@ table {
   padding-top: 8px;
 }
 
-/* Analytics */
 .analytics-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1061,7 +1047,6 @@ table {
   font-size: 0.65rem;
 }
 
-/* Help Guide */
 .help-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1095,7 +1080,6 @@ kbd {
   margin-right: 2px;
 }
 
-/* Toasts */
 #toast-container {
   position: absolute;
   bottom: 80px;
@@ -1123,7 +1107,6 @@ kbd {
 .toast-warn { border-left-color: var(--accent-yellow); }
 .toast-error { border-left-color: var(--accent-red); }
 
-/* Confirmation Modal (Dismantle / Flush) */
 .confirm-box {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
@@ -1150,14 +1133,12 @@ kbd {
   justify-content: center;
 }
 
-/* Utilities */
 .hidden { display: none !important; }
 .text-amber { color: var(--accent-yellow); }
 .text-green { color: var(--accent-green); }
 .text-red { color: #e74c3c; }
 .text-power { color: var(--accent-yellow); }
 
-/* Scrollbars */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -1173,7 +1154,6 @@ kbd {
   background: var(--accent-yellow);
 }
 
-/* Flat industrial HUD pass ------------------------------------------------ */
 .glass-panel {
   background: var(--bg-panel);
   border-color: var(--border-dim);
@@ -1221,7 +1201,6 @@ kbd {
   color: var(--text-main);
 }
 
-/* The inspector is a fixed edge HUD, not a floating modal. */
 .modal-panel {
   position: fixed;
   top: 0;
@@ -1384,7 +1363,6 @@ kbd {
   font-style: normal;
 }
 
-/* Cycle is intentionally quieter than the carded machine statistics. */
 .crafting-gauge-wrap {
   padding: 8px 0;
   border: 0;
@@ -1459,7 +1437,6 @@ button:focus-visible {
   .btn-action { padding: 0 8px; font-size: 11px; }
 }
 
-/* Compact telemetry inspector: the top command bar always owns y: 0–56px. */
 .hud-header {
   height: 56px;
   z-index: 80;
@@ -1491,14 +1468,12 @@ button:focus-visible {
   gap: 10px;
 }
 
-/* Show only the controls and telemetry that this facility actually uses. */
 .inspector-no-power-telemetry .inspector-power-grid,
 .inspector-no-cycle .crafting-gauge-wrap,
 .inspector-single-buffer .inspector-buffer-section:last-child {
   display: none;
 }
 
-/* Power infrastructure is a distinct system, not a production machine. */
 .inspector-electrical .inspector-power-grid .inspector-section {
   border-color: rgba(245, 166, 35, 0.5);
   background: var(--bg-card);
@@ -1542,7 +1517,6 @@ button:focus-visible {
 .crafting-gauge-wrap .cycle-ring { margin: 0 auto 6px; }
 .crafting-gauge-wrap .gauge-label { justify-content: center; }
 
-/* The Delivery Station uses a compact SCADA-like layout, not a card stack. */
 .delivery-station-inspector .panel-content {
   gap: 12px;
 }
@@ -1620,7 +1594,6 @@ button:focus-visible {
   }
 }
 
-/* Delivery Station: floating frosted-glass transfer console. */
 .inspector-machine-glyph,
 .inspector-header-divider,
 .inspector-secondary-stat,
@@ -1926,7 +1899,6 @@ button:focus-visible {
   .delivery-station-inspector .inventory-slots { grid-template-columns: repeat(2, 44px); }
 }
 
-/* Restore the compact docked telemetry variant (reverts the glass console). */
 .delivery-station-inspector.modal-panel {
   top: 56px;
   right: 0;
