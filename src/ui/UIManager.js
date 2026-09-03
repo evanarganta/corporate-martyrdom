@@ -392,7 +392,7 @@ export class UIManager {
       const cost = this.economy.getBuildingCost(b);
       const isAffordable = this.economy.canAfford(cost);
       slot.className = `hotbar-slot ${isUnlocked ? '' : 'locked'} ${isAffordable ? '' : 'unaffordable'} ${this.scene.activeTool === b.id ? 'active' : ''}`;
-      slot.title = `${b.name} [${idx + 1}]\nCost: ${this.economy.format(cost)}\nPower: ${b.powerDemand > 0 ? b.powerDemand + ' kW' : (b.powerOutput > 0 ? '+' + b.powerOutput + ' kW' : 'Passive')}`;
+      slot.title = `${b.name} [${idx + 1}]\nCost: ${this.economy.format(cost)}\nPower: ${b.powerDemand > 0 ? b.powerDemand + ' kW' : (b.powerOutput > 0 ? '+' + b.powerOutput + ' kW' : 'Passive')}${b.siteNote ? `\n\n${b.siteNote}` : ''}`;
 
       slot.innerHTML = `
         <div class="slot-icon-image">${b.iconSvg}</div>
@@ -635,6 +635,8 @@ export class UIManager {
           ? 'distribution'
           : 'consumer';
 
+    this.inspectorPowerVal.classList.remove('power-distribution-value');
+
     if (powerRole === 'producer') {
       this.inspectorGridLabel.textContent = 'GRID CONNECTION';
       this.inspectorGridMetricLabel.textContent = 'Network';
@@ -661,8 +663,10 @@ export class UIManager {
       this.inspectorEfficiencyVal.textContent = `${Math.round(b.powerReceived || 0)} kW`;
       this.inspectorEfficiencyBar.style.width = `${Math.min(100, Math.round(((b.powerReceived || 0) / Math.max(1, b.powerSupplied || b.powerReceived || 1)) * 100))}%`;
       this.inspectorPowerLabel.textContent = 'OUTGOING POWER';
-      this.inspectorPowerMetricLabel.textContent = 'Branches';
+      this.inspectorPowerMetricLabel.textContent = 'Transmission';
       this.inspectorPowerVal.textContent = `${Math.round(b.powerSupplied || 0)} kW · ${reach} tile reach`;
+      this.inspectorPowerVal.classList.add('power-distribution-value');
+      this.inspectorPowerVal.innerHTML = `<strong>${Math.round(b.powerSupplied || 0)} kW</strong><small>${reach} tile reach</small>`;
     } else {
       this.inspectorGridLabel.textContent = 'GRID SATISFACTION';
       this.inspectorGridMetricLabel.textContent = 'Grid';

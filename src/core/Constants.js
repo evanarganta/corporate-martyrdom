@@ -414,6 +414,7 @@ export const BUILDINGS = {
     directional: true,
     miningRate: 1.0,
     powerDemand: 20,
+    siteNote: 'Foundation access class. Martyr Corp’s old survey marks this seam as self-renewing.',
     iconSvg: SVG_ICONS.burner_drill,
     cost: [{ item: 'iron_plate', count: 8 }]
   },
@@ -438,6 +439,7 @@ export const BUILDINGS = {
     directional: true,
     miningRate: 6.0,
     powerDemand: 120,
+    siteNote: 'Deep structural access. The return signal source is not listed in Martyr Corp’s sector record.',
     iconSvg: SVG_ICONS.deep_drill,
     cost: [{ item: 'reinforced_plate', count: 10 }, { item: 'motor', count: 6 }, { item: 'microchip', count: 4 }]
   },
@@ -512,6 +514,7 @@ export const BUILDINGS = {
     supplyRadius: 8,
     wireReach: 8,
     powerDemand: 0,
+    siteNote: 'Utility riser. Its rated height is omitted from the Martyr Corp local plan.',
     iconSvg: SVG_ICONS.power_pole,
     cost: [{ item: 'iron_plate', count: 2 }, { item: 'copper_wire', count: 4 }]
   },
@@ -576,6 +579,7 @@ export const BUILDINGS = {
     height: 4,
     directional: false,
     powerDemand: 0,
+    siteNote: 'Freight interchange. Martyr Corp route clearance remains pre-authorized.',
     iconSvg: SVG_ICONS.launchpad,
     cost: [{ item: 'reinforced_plate', count: 20 }, { item: 'motor', count: 10 }, { item: 'circuit_board', count: 15 }]
   }
@@ -720,7 +724,7 @@ export const TECH_MILESTONES = [
     id: 'tier0_landing',
     tier: 0,
     title: 'Basic Logistics',
-    description: 'Smelt raw ore into ingots and deliver them to the Central Hub.',
+    description: 'You are expanding Martyr Corporation’s planet-spanning Macrostructure. Mine its renewable deck reserves, smelt them, and deliver the ingots to the Central Hub.',
     costRP: 0,
     deliveries: [
       { item: 'iron_ingot', target: 20 }
@@ -733,7 +737,7 @@ export const TECH_MILESTONES = [
     id: 'tier1_metallurgy',
     tier: 1,
     title: 'Electrification',
-    description: 'Power grid networks, electric drills, and component manufacturing.',
+    description: 'Install grid relays and extraction rigs into the Macrostructure’s existing utility spine. Every pole is a tower; every seam leads deeper into Martyr Corp territory.',
     costRP: 50,
     deliveries: [
       { item: 'iron_ingot', target: 60 },
@@ -747,7 +751,7 @@ export const TECH_MILESTONES = [
     id: 'tier2_electronics',
     tier: 2,
     title: 'Circuitry',
-    description: 'Silicon processing, logic circuit boards, and motors.',
+    description: 'Process the Macrostructure’s mineral feedstock into control systems. The world beneath this sector is not bedrock: it is Martyr Corp machinery.',
     costRP: 150,
     deliveries: [
       { item: 'iron_plate', target: 120 },
@@ -762,7 +766,7 @@ export const TECH_MILESTONES = [
     id: 'tier3_advanced_logistics',
     tier: 3,
     title: 'High-Speed Logistics',
-    description: 'Express conveyor belts, foundries, and microprocessors.',
+    description: 'Connect your sector to the Macrostructure’s high-speed production network. Martyr Corp’s conveyor routes extend beyond the horizon in every direction.',
     costRP: 350,
     deliveries: [
       { item: 'circuit_board', target: 80 },
@@ -777,7 +781,7 @@ export const TECH_MILESTONES = [
     id: 'tier4_orbital_uplink',
     tier: 4,
     title: 'Advanced Automation',
-    description: 'Heavy bore extractors and high-tier control cores.',
+    description: 'Deploy heavy bore extractors into the Macrostructure’s deep reserves. The planet was rebuilt as Martyr Corp infrastructure; the reserves below are designed to last.',
     costRP: 750,
     deliveries: [
       { item: 'microchip', target: 100 },

@@ -140,6 +140,38 @@ table {
   gap: 12px;
 }
 
+.corp-masthead {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #f5a623;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  line-height: 1;
+}
+
+.corp-mark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #f5a623;
+  color: #0f1420;
+  background: #f5a623;
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 50% 100%, 0 82%);
+  font-size: 0.88rem;
+}
+
+.corp-name small {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-dim);
+  font-size: 0.48rem;
+  letter-spacing: 0.8px;
+}
+
 .stat-pill {
   display: flex;
   align-items: center;
@@ -1318,6 +1350,33 @@ kbd {
 }
 
 .metric-row .text-green { color: var(--accent-green); }
+
+.power-distribution-value {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
+  min-width: 0;
+  text-align: right;
+  line-height: 1;
+}
+
+.power-distribution-value strong {
+  color: var(--accent-amber);
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.power-distribution-value small {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.61rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
 
 .progress-bar-wrap {
   height: 4px;

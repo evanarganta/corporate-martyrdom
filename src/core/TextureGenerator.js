@@ -1,6 +1,16 @@
 import { TILE_SIZE, ITEMS } from './Constants.js';
 
 export class TextureGenerator {
+  static stampMartyrMark(ctx, x, y, size = 14, color = '#f5a623') {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.font = `800 ${size}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('M', x, y);
+    ctx.restore();
+  }
+
   static generateAll(scene) {
     this.generateTerrainTextures(scene);
     this.generateOreTextures(scene);
@@ -408,6 +418,7 @@ export class TextureGenerator {
     bdCtx.lineTo(w2 / 2 + 8, 18);
     bdCtx.closePath();
     bdCtx.fill();
+    this.stampMartyrMark(bdCtx, 15, 15, 12);
     bdCanvas.refresh();
 
     const edCanvas = scene.textures.createCanvas('electric_drill', s * 2, s * 2);
@@ -432,6 +443,7 @@ export class TextureGenerator {
     edCtx.lineTo(w2 / 2 + 10, 18);
     edCtx.closePath();
     edCtx.fill();
+    this.stampMartyrMark(edCtx, 15, 15, 12, '#f8fafc');
     edCanvas.refresh();
 
     const ddCanvas = scene.textures.createCanvas('deep_drill', s * 3, s * 3);
@@ -457,6 +469,7 @@ export class TextureGenerator {
     ddCtx.lineTo(w3 / 2 + 14, 24);
     ddCtx.closePath();
     ddCtx.fill();
+    this.stampMartyrMark(ddCtx, 20, 20, 18, '#f5a623');
     ddCanvas.refresh();
 
     const smCanvas = scene.textures.createCanvas('smelter_mk1', s * 2, s * 2);
@@ -550,6 +563,7 @@ export class TextureGenerator {
     ppCtx.beginPath();
     ppCtx.arc(s / 2, s / 2, 5, 0, Math.PI * 2);
     ppCtx.fill();
+    this.stampMartyrMark(ppCtx, s / 2, 8, 9, '#f8fafc');
     ppCanvas.refresh();
 
     const cgCanvas = scene.textures.createCanvas('coal_generator', s * 2, s * 2);
@@ -636,6 +650,11 @@ export class TextureGenerator {
     lpCtx.beginPath();
     lpCtx.arc(w4 / 2, w4 / 2, 34, 0, Math.PI * 2);
     lpCtx.fill();
+    lpCtx.fillStyle = '#f5a623';
+    lpCtx.font = '800 15px monospace';
+    lpCtx.textAlign = 'center';
+    lpCtx.fillText('MARTYR CORP', w4 / 2, 28);
+    this.stampMartyrMark(lpCtx, w4 / 2, w4 / 2, 28, '#f8fafc');
     lpCanvas.refresh();
   }
 

@@ -24,6 +24,7 @@ export class MainGameScene extends Phaser.Scene {
 
     this.terrainLayer = null;
     this.oreLayer = null;
+    this.structureLabels = null;
     this.buildingGraphics = null;
     this.powerLineGraphics = null;
     this.itemGraphics = null;
@@ -69,6 +70,7 @@ export class MainGameScene extends Phaser.Scene {
   createWorldLayers() {
     this.terrainLayer = this.add.graphics().setDepth(0);
     this.oreLayer = this.add.graphics().setDepth(1);
+    this.structureLabels = this.add.container(0, 0).setDepth(2);
     this.buildingGraphics = this.add.graphics().setDepth(10);
     this.powerLineGraphics = this.add.graphics().setDepth(15);
     this.itemGraphics = this.add.graphics().setDepth(20);
@@ -87,6 +89,7 @@ export class MainGameScene extends Phaser.Scene {
   renderStaticWorld() {
     this.terrainLayer.clear();
     this.oreLayer.clear();
+    this.structureLabels.removeAll(true);
 
     const s = TILE_SIZE;
 
@@ -94,10 +97,35 @@ export class MainGameScene extends Phaser.Scene {
       for (let x = 0; x < WORLD_WIDTH; x++) {
         const px = x * s;
         const py = y * s;
-        this.terrainLayer.fillStyle(0x141c2b, 1);
+        const bayTone = (Math.floor(x / 8) + Math.floor(y / 8)) % 2 === 0 ? 0x141c2b : 0x111925;
+        this.terrainLayer.fillStyle(bayTone, 1);
         this.terrainLayer.fillRect(px, py, s, s);
         this.terrainLayer.lineStyle(1, 0x1b263b, 0.6);
         this.terrainLayer.strokeRect(px + 0.5, py + 0.5, s - 1, s - 1);
+
+        if (x % 8 === 0) {
+          this.terrainLayer.fillStyle(0x263244, 0.95);
+          this.terrainLayer.fillRect(px, py, 3, s);
+          this.terrainLayer.lineStyle(1, 0xf5a623, 0.35);
+          this.terrainLayer.lineBetween(px + 5, py + 5, px + 5, py + s - 5);
+        }
+        if (y % 8 === 0) {
+          this.terrainLayer.fillStyle(0x263244, 0.95);
+          this.terrainLayer.fillRect(px, py, s, 3);
+          this.terrainLayer.lineStyle(1, 0xf5a623, 0.35);
+          this.terrainLayer.lineBetween(px + 5, py + 5, px + s - 5, py + 5);
+        }
+
+        if (x % 16 === 8 && y % 16 === 8) {
+          this.terrainLayer.lineStyle(3, 0xf5a623, 0.65);
+          this.terrainLayer.beginPath();
+          this.terrainLayer.moveTo(px + 13, py + 33);
+          this.terrainLayer.lineTo(px + 13, py + 15);
+          this.terrainLayer.lineTo(px + 24, py + 27);
+          this.terrainLayer.lineTo(px + 35, py + 15);
+          this.terrainLayer.lineTo(px + 35, py + 33);
+          this.terrainLayer.strokePath();
+        }
 
         const tile = this.grid.getTileAt(x, y);
         if (tile && tile.ore) {
@@ -106,6 +134,21 @@ export class MainGameScene extends Phaser.Scene {
         }
       }
     }
+
+    [
+      { x: 6, y: 7, text: 'MARTYR CORPORATION // MACROSTRUCTURE DECK 07' },
+      { x: 78, y: 7, text: 'AUTHORIZED INDUSTRIAL TERRITORY // DO NOT DEVIATE' },
+      { x: 6, y: 112, text: 'MARTYR CORP // PLANETARY FABRICATION ASSET' }
+    ].forEach(mark => {
+      const label = this.add.text(mark.x * s, mark.y * s, mark.text, {
+        fontFamily: 'monospace',
+        fontSize: '11px',
+        color: '#f5a623',
+        stroke: '#0b0f19',
+        strokeThickness: 3
+      }).setAlpha(0.72).setOrigin(0, 0.5);
+      this.structureLabels.add(label);
+    });
   }
 
   setupCameraControls() {
