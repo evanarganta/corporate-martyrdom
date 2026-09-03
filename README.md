@@ -1,6 +1,6 @@
 # Corporate Martyrdom
 
-<p align="justify">Corporate Martyrdom is a browser-based factory automation simulator inspired by the likes of Satisfactory, Mindustry, and Industralist. Build a production line, route materials through conveyors and storage, manage a component-based power grid, and deliver goods to grow your small part in the superstructure.</p>
+<p align="justify">Corporate Martyrdom is a browser-based factory automation simulator inspired by the likes of Factorio, Mindustry, and Satisfactory. Build a production line, route materials through conveyors and storage, manage a component-based power grid, and deliver goods to grow your small part in the superstructure.</p>
 
 <br><img width="100%" alt="gambar" src="https://github.com/user-attachments/assets/92a3f693-8298-464d-bc23-e63986dc1e3f" /><br>
 
